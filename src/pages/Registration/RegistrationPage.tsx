@@ -6,7 +6,7 @@ import { PasswordInput } from "../../components/PasswordInput";
 import { Button } from "../../components/Button";
 import "../Login/loginPage.css"; 
 import "./registration.css";
-import { supabse } from "../../lib/supabaseClient";
+import { supabase } from "../../lib/supabaseClient";
 
 
 
@@ -42,7 +42,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({...prev, [name]: type === 'checkbox' ? checked : value}));
 };
 
-const handleSubmit = (e) => {
+const handleSubmit = async (e:React.FormEvent) => {
     e.preventDefault();
     console.log('REGISTER DATA : ', formData);
 
@@ -61,7 +61,7 @@ const handleSubmit = (e) => {
 
     // auth signUp
     try  {
-        const {data, error: singUpError} = await supabse.auth.signUp({
+        const {data, error: singUpError} = await supabase.auth.signUp({
             email: formData.email,
             password: formData.password,
         });
@@ -75,7 +75,7 @@ const handleSubmit = (e) => {
 
 
         // insert iz forme za registraciju u tabelu profiles u supabase
-        const {error: profileError} = await supabse.from("profiles").insert({
+        const {error: profileError} = await supabase.from("profiles").insert({
             id: user.id,
             firstName: formData.firstName,
             lastName: formData.lastName,
@@ -92,6 +92,7 @@ const handleSubmit = (e) => {
         setError(err?.message ?? "Registration failed");
     } finally {
         setIsLoading(false);
+        
     }
 }
 
