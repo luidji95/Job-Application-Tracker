@@ -1,21 +1,18 @@
 :root {
-  --primary: #10b981;
-  --primary-dark: #059669;
-  --secondary: #6b7280;
-  --danger: #ef4444;
-  --light: #f9fafb;
-  --dark: #111827;
-  --border: #e5e7eb;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --bg: #0b1020;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #475569;
 
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --accent: #14b8a6;     /* mint */
+  --accent-2: #6366f1;   /* indigo */
+
+  --border: rgba(15, 23, 42, 0.14);
+  --shadow: 0 22px 70px rgba(0, 0, 0, 0.35);
+
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -25,49 +22,25 @@
 
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 body {
   margin: 0;
-  min-width: 320px;
   min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
 }
 
+/* global link (možeš kasnije override u loginPage.css) */
 a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+  color: var(--accent-2);
+  text-decoration: none;
 }
-
 a:hover {
-  color: #535bf2;
+  text-decoration: underline;
 }
 
+/* BITNO: ne diramo global button, jer ti Button komponenta ima svoj CSS */
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
   font-family: inherit;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-
-  a:hover {
-    color: #747bff;
-  }
 }

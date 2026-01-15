@@ -1,24 +1,19 @@
-import { Input } from "./components/Input";
-import { Button } from "./components/Button";
-import { useState } from "react";
-import "./index.css";
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LoginPage } from "./pages/Login/LoginPage";
+import { RegistrationPage } from "./pages/Registration/RegistrationPage";
 
-function App() {
-
-
+export default function App() {
   return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegistrationPage></RegistrationPage>} />
 
-    <>
-      
-      <LoginPage></LoginPage>
-    </>
-    
-
-
-    
-
+        {/* fallback */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
-
-export default App;

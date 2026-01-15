@@ -1,31 +1,55 @@
+/* Login form css*/
+
 .form {
   display: grid;
-  gap: 10px;
+  gap: 1rem;
 }
 
-.form-group {
+
+
+.form-actions {
   display: grid;
-  gap: 6px;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
 }
 
-/* (ako koristiš svoje label-e, i dalje će raditi lepo) */
-.form-label {
-  color: rgba(248, 250, 252, 0.78);
-  font-size: 13px;
+/* footer */
+.form-footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.875rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
 }
 
-/* bottom text */
-.form p {
-  margin: 10px 0 0;
-  color: rgba(248, 250, 252, 0.72);
-  font-size: 13px;
-}
-
-.form a {
-  color: #3b82f6;
+.form-footer a {
+  color: var(--accent-2);
+  font-weight: 600;
   text-decoration: none;
 }
 
-.form a:hover {
+.form-footer a:hover {
+  color: var(--accent);
   text-decoration: underline;
+}
+
+/* Guest demo button  */
+.guest-demo-btn {
+  border-style: dashed !important;
+  border-width: 2px !important;
+  border-color: var(--accent-2) !important;
+  opacity: 0.95;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.guest-demo-btn:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.18);
+  border-style: solid !important;
+}
+
+.guest-icon {
+  margin-right: 8px;
 }
