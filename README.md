@@ -1,73 +1,58 @@
-# React + TypeScript + Vite
+## Job Application Tracker (Auth Module) 
+Autentification flow built with React and TypeScript and Supabase.
+Includes regigistration with email confirmation, login, profile upsert, and protected dashboard access.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Tech stack
+- React + TypeScript (Vite)
+- React Router
+- Supabase (Auth + Postgres)
 
-Currently, two official plugins are available:
+## Features (current)
+- Register with email + password (email confirmation enabled)
+- Login with Supabase Auth
+- Create/update user profile on first successful login (UPSERT into "profiles")
+- Auth layout + reusable UI components (Button, Input, Spiner, PasswordInput)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Auth flow (how it works)
+1. **Register**
+  - Calls `supabase.auth.signUp(email,password)`
+  - Supabse sends a confirmation mail
+  - No `prifiles` insert happens here (no authenticated session before confirmation)
 
-## React Compiler
+2. **Confirm email**
+  - User confirms signup via email link
+  
+3. **Login**
+  - Calls `supabase.auth.signInWithPassword(email,password)`
+  - On successful login the app runs:
+    - `upsert` into `profiles` using the authenticated user id (`auth.users.id`)
+  - Redirects to `/dashborad`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Why upsert on login? 
+- With email confirmation enabled, the user isn't fully authenticated right after signup, so RLS would block insrt into `profiles`.
+- Upsert keeps the flow idempotent: safe to run on every login.
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Database setup (Supabase)
+## Table: `profiles`
+Recommended columns: 
+- `id` (uuid, primary key, foregin key -> `auth.users.id`)
+- `email` (text)
+- `firstName` (text)
+- `lastName` (text)
+- `username` (text)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## RLS policies
+Enable RLS on `profiles` and add policies:
+- Select own profile
+- Insert own profiles
+- Update own profile
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Example logic: 
+- `auth.uid() = id`
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Enviroment variables
+Create a `.env` file in project root
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
