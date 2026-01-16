@@ -1,9 +1,11 @@
 import React from 'react'
 import "./dashboard.css";
+import { Topbar } from '../../features/components/Topbar';
 
 const Dashboard = () => {
   return (
-    <div className='dash'>Dashboard</div>
+    
+    <Topbar/>
   )
 }
 

@@ -1,0 +1,10 @@
+.topbar{
+    height: 150px;
+    width: 600px;
+    background-color: blue;
+}
+.topbar-main{
+    height: 150px;
+    width: 600px;
+    background-color: rgba(83, 83, 126, 0.836);
+}
