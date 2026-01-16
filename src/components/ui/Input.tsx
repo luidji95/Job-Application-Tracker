@@ -1,5 +1,5 @@
 import React from "react";
-import "./input.css"
+import "./css/input.css";
 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label?: string;

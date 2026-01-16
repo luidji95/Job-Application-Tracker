@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { LoginPage } from "./pages/Login/LoginPage";
-import { RegistrationPage } from "./pages/Registration/RegistrationPage";
+import { LoginPage } from "./pages/Auth/Login/LoginPage";
+import { RegistrationPage } from "./pages/Auth/Registration/RegistrationPage";
 import Dashboard from "./pages/Dashboard/Dashboard";
 
 export default function App() {

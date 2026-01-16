@@ -1,5 +1,5 @@
 import React from "react";
-import './spiner.css';
+import "./css/spiner.css";
 
 type SpinnerProps = {
   size?: number;

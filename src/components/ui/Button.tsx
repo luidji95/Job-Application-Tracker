@@ -1,6 +1,6 @@
 import React from "react";
 import { Spinner } from "./Spinner";
-import "./button.css";
+import "./css/button.css";
 
 type ButtonVariant = "primary" | "secondary" | "danger" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";

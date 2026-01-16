@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthLayout } from "../../layouts/AuthLayout/AuthLayout";
-import { Input } from "../../components/Input";
-import { PasswordInput } from "../../components/PasswordInput";
-import { Button } from "../../components/Button";
+import { AuthLayout } from "../../../layouts/AuthLayout/AuthLayout";
+import { Input } from "../../../components/ui/Input";
+import { PasswordInput } from "../../../components/ui/PasswordInput";
+import { Button } from "../../../components/ui/Button";
 import "../Login/loginPage.css"; 
 import "./registration.css";
-import { supabase } from "../../lib/supabaseClient";
+import { supabase } from "../../../lib/supabaseClient";
 
 
 

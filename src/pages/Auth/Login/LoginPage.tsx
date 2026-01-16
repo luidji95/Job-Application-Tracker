@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { Input } from '../../components/Input'
-import { Button } from '../../components/Button'
-import { AuthLayout } from '../../layouts/AuthLayout/AuthLayout';
-import { PasswordInput } from '../../components/PasswordInput';
+import { Input } from '../../../components/ui/Input'
+import { Button } from '../../../components/ui/Button'
+import { AuthLayout } from '../../../layouts/AuthLayout/AuthLayout';
+import { PasswordInput } from '../../../components/ui/PasswordInput';
 import "./loginPage.css";
 import { Link } from 'react-router-dom';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '../../../lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
 type LoginFormData = {

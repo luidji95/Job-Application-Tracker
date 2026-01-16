@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Input } from "./Input";
-import "./passwordInput.css";
+import "./css/passwordInput.css";
 
 type PasswordInputProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
