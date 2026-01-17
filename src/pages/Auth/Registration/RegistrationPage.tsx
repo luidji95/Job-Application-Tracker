@@ -55,7 +55,7 @@ export const RegistrationPage = () => {
       if (signUpError) throw signUpError;
 
       // Ovde user mora da potvrdi preko mejla autetifikaciju
-      setMessage("Account created. Please check your email to confirm, then login.");
+      setMessage("If an account with this email exists, you’ll receive a confirmation email shortly. Please check your inbox (and spam).");
 
       reset();
     } catch (err: unknown) {

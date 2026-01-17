@@ -1,7 +1,20 @@
 
 import "./css/topbar.css";
+import { supabase } from "../../lib/supabaseClient";
+import { useNavigate } from "react-router-dom";
+
+
+
 
 export const Topbar = () => {
+    const navigate = useNavigate();
+
+      const handleLogout = async () => {
+         await supabase.auth.signOut();
+         navigate("/login", { replace: true });
+     };
+
+
   return (
        <header className='topbar'>
 
@@ -33,6 +46,10 @@ export const Topbar = () => {
                     <button>Add job</button>
                     <button>Add column</button>
                 </div>
+            </div>
+
+            <div className="logout-btn" onClick={handleLogout}>
+                <button>Logout</button>
             </div>
 
        </header>
