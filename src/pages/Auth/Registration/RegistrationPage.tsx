@@ -50,17 +50,19 @@ export const RegistrationPage = () => {
         password: data.password, 
       });
 
+      if (signUpError) throw signUpError;
+
       localStorage.setItem(
         "pending_profile",
         JSON.stringify({
           firstName: data.firstName,
           lastName: data.lastName,
-          userName: data.username,
+          username: data.username,
         })
       );
 
 
-      if (signUpError) throw signUpError;
+      
 
       // Ovde user mora da potvrdi preko mejla autetifikaciju
       setMessage("If an account with this email exists, you’ll receive a confirmation email shortly. Please check your inbox (and spam).");

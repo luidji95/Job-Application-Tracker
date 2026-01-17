@@ -1,47 +1,54 @@
-
-import "./dashboard.css";
-import { Topbar } from '../../features/components/Topbar';
-import { Sidebar } from '../../features/components/Sidebar';
-import { KanbanBoard } from '../../features/components/KanbanBoard';
-
-import { supabase } from "../../lib/supabaseClient";
 import { useEffect, useState } from "react";
+import "./dashboard.css";
+
+import { Topbar } from "../../features/components/Topbar";
+import { Sidebar } from "../../features/components/Sidebar";
+import { KanbanBoard } from "../../features/components/KanbanBoard";
+import { supabase } from "../../lib/supabaseClient";
+
+type Profile = {
+  userName: string | null;
+  email: string | null;
+};
 
 const Dashboard = () => {
-    const [profile, setProfile] = useState<{
-  userName: string | null;
-} | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
-useEffect(() => {
-  const loadProfile = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) return;
+  useEffect(() => {
+    const loadProfile = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-    const { data } = await supabase
-      .from("profiles")
-      .select("userName")
-      .eq("id", session.user.id)
-      .single();
+      if (!session?.user) return;
 
-    setProfile(data);
-  };
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("userName, email")
+        .eq("id", session.user.id)
+        .single();
 
-  loadProfile();
-}, []);
+      if (error) {
+        console.error("Failed to load profile:", error.message);
+        return;
+      }
+
+      setProfile(data);
+    };
+
+    loadProfile();
+  }, []);
 
   return (
+    <div className="dashboard-shell">
+      <Sidebar />
 
-    <div className='dashboard-shell'>
-        <Sidebar/>
-
-        <main className='dashboard-content'>
-            <Topbar userName={profile}/>
-            <KanbanBoard/>
-        </main>
+      <main className="dashboard-content">
+        <Topbar userName={profile?.userName ?? profile?.email ?? "User"} />
+        <KanbanBoard />
+      </main>
     </div>
-    
-    
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
