@@ -1,12 +1,42 @@
-.dashboard-shell {
+.dash {
   height: 100vh;
-  width: 100%;
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 260px 1fr;
+
+
+  background:
+    radial-gradient(circle at 20% 50%, rgba(20, 184, 166, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.10) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
 }
 
-.dashboard-content {
-  display: flex;
-  flex-direction: column;
-  min-width: 0; 
+.dash__sidebar {
+  height: 100vh;
+  overflow: auto;
+
+
+  background: rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(12px);
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+
+.dash__right {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr; 
+  overflow: hidden;
+}
+
+.dash__topbar {
+
+  background: rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+
+.dash__kanban {
+  background: #050505;
+  overflow: auto;
+  padding: 12px;
 }

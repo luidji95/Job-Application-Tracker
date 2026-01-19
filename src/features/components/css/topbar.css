@@ -1,13 +1,15 @@
 .topbar {
   min-height: 120px;
   width: 100%;
-  background-color: whitesmoke;
   box-sizing: border-box;
   padding: 10px 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   border-bottom: 1px solid #e5e5e5;
+  color:white;
+  
+
 }
 
 .topbar-main {

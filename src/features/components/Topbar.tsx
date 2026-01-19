@@ -3,8 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabaseClient";
 import "./css/topbar.css";
 
+import { LogOut, Search, Plus } from "lucide-react";
+
 type TopbarProps = {
   userName: string;
+  avatarUrl?: string;
 };
 
 export const Topbar = ({ userName }: TopbarProps) => {
@@ -23,9 +26,7 @@ export const Topbar = ({ userName }: TopbarProps) => {
         </div>
 
         <div className="topbar-profile">
-          <button className="notification-btn">
-            <span className="notification-icon">🔔</span>
-          </button>
+        
 
           <div className="profile-info">
             <div className="profile-avatar" />
@@ -33,14 +34,15 @@ export const Topbar = ({ userName }: TopbarProps) => {
           </div>
 
           <div className="logout-btn">
-            <button onClick={handleLogout}>Logout</button>
+            <button onClick={handleLogout}><LogOut size={16}></LogOut></button>
           </div>
         </div>
       </div>
 
       <div className="topbar-toolbar">
         <div className="toolbar-search">
-          <input type="text" placeholder="Search jobs" />
+          <input type="text" placeholder="Search jobs"  /><Search></Search>
+          
         </div>
 
         <div className="toolbar-actions">

@@ -40,15 +40,23 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="dashboard-shell">
+  <div className="dash">
+    <aside className="dash__sidebar">
       <Sidebar />
+    </aside>
 
-      <main className="dashboard-content">
+    <div className="dash__right">
+      <div className="dash__topbar">
         <Topbar userName={profile?.userName ?? profile?.email ?? "User"} />
+      </div>
+
+      <div className="dash__kanban">
         <KanbanBoard />
-      </main>
+      </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default Dashboard;
