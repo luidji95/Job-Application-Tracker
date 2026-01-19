@@ -1,6 +1,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabaseClient";
+import "./css/topbar.css";
 
 type TopbarProps = {
   userName: string;
@@ -30,6 +31,10 @@ export const Topbar = ({ userName }: TopbarProps) => {
             <div className="profile-avatar" />
             <span className="profile-name">{userName}</span>
           </div>
+
+          <div className="logout-btn">
+            <button onClick={handleLogout}>Logout</button>
+          </div>
         </div>
       </div>
 
@@ -44,9 +49,7 @@ export const Topbar = ({ userName }: TopbarProps) => {
         </div>
       </div>
 
-      <div className="logout-btn">
-        <button onClick={handleLogout}>Logout</button>
-      </div>
+      
     </header>
   );
 };

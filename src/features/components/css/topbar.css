@@ -1,57 +1,129 @@
-.topbar{
-    min-height: 120px;
-    width: 100%;
-    background-color: whitesmoke;
-    box-sizing: border-box;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-}
-.topbar-main{
-    height: 75px;
-    width: 100%;
-    /* background-color: aqua; */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px;
-
+.topbar {
+  min-height: 120px;
+  width: 100%;
+  background-color: whitesmoke;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-bottom: 1px solid #e5e5e5;
 }
 
-.topbar-profile{
-    /* height: 70px;
-    width: 100px;
-    background-color: rgba(187, 212, 45, 0.836); */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
+.topbar-main {
+  height: 75px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
 }
-.topbar-toolbar{
-    /* background-color: red; */
-    height: 75px;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px;
 
+.topbar-brand p {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
 }
-.toolbar-actions{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
+
+.topbar-profile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
-.notification-icon{
-    cursor: pointer;
+
+
+.notification-btn {
+  background: transparent;
+  border: none;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 .notification-btn:hover {
   opacity: 0.8;
 }
-.toolbar-actions button {
-  padding: 8px 14px;
-  border-radius: 6px;
+
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
+.profile-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #cfcfcf;
+}
+
+.profile-name {
+  font-weight: 600;
+}
+
+/* Logout wrapper (da ne remeti layout) */
+.logout-btn {
+  display: flex;
+  align-items: center;
+}
+
+
+.logout-btn button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+}
+.logout-btn button:hover {
+  opacity: 0.85;
+}
+
+
+.topbar-toolbar {
+  height: 75px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  gap: 12px;
+}
+
+.toolbar-search {
+  flex: 1;
+  max-width: 420px;
+}
+
+.toolbar-search input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  outline: none;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toolbar-actions button {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+}
+
+.toolbar-actions button:hover {
+  opacity: 0.9;
+}
+.profile-name {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
