@@ -47,3 +47,32 @@
 .dash__kanban:hover::before {
   opacity: 1;
 }
+/* features/components/css/kanbanBoard.css */
+
+.kanban-board {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    overflow-x: auto; /* Horizontalni scroll ako ne stane */
+    height: calc(100vh - 160px); /* Prilagodi visinu */
+    align-items: flex-start; /* Poravnaj na vrh */
+}
+
+/* Stil za scrollbar (opcionalno) */
+.kanban-board::-webkit-scrollbar {
+    height: 8px;
+}
+
+.kanban-board::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.kanban-board::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.kanban-board::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}

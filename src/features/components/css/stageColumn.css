@@ -1,0 +1,86 @@
+/* features/components/css/stageColumn.css */
+
+
+
+.stage_column_header {
+    padding: 16px;
+    border-top: 4px solid #4f46e5;
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.stage_column_header h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.jobs_column_count {
+    background: #e5e7eb;
+    color: #4b5563;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    min-width: 24px;
+    text-align: center;
+}
+
+.stage_column_add_btn {
+    background: #f3f4f6;
+    color: #4b5563;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.stage_column_add_btn:hover {
+    background: #e5e7eb;
+    color: #1f2937;
+}
+
+.stage_column_add_btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.stage_column_body {
+    padding: 12px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stage_column_empty {
+    text-align: center;
+    color: #9ca3af;
+    font-size: 14px;
+    padding: 32px 16px;
+    background: white;
+    border-radius: 8px;
+    border: 2px dashed #e5e7eb;
+    margin: 0;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

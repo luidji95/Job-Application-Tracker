@@ -6,6 +6,7 @@ import { Sidebar } from "../../features/components/Sidebar";
 import { KanbanBoard } from "../../features/components/KanbanBoard";
 import { supabase } from "../../lib/supabaseClient";
 
+
 type Profile = {
   userName: string | null;
   email: string | null;
@@ -52,6 +53,7 @@ const Dashboard = () => {
 
       <div className="dash__kanban">
         <KanbanBoard />
+        
       </div>
     </div>
   </div>

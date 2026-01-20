@@ -1,0 +1,175 @@
+/* features/components/css/companyCard.css */
+
+.company_card {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #4f46e5;
+    transition: all 0.2s ease;
+    cursor: move; /* Za drag & drop */
+}
+
+.company_card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.company_card--rejected {
+    border-left-color: #ef4444;
+    opacity: 0.8;
+}
+
+.company_card--accepted {
+    border-left-color: #10b981;
+}
+
+.company_card_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.company_card_info {
+    flex: 1;
+}
+
+.company_card_info h4 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.company_card_info p {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+    color: #4b5563;
+}
+
+.company_card_info p:last-child {
+    margin-bottom: 0;
+    font-size: 12px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.company_card_menu {
+    flex-shrink: 0;
+}
+
+.menu_btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    line-height: 1;
+    height: 24px;
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu_btn:hover {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.company_card_details {
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.details_item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.details_item:last-child {
+    margin-bottom: 12px;
+}
+
+.detail_label {
+    color: #6b7280;
+}
+
+.detail_value {
+    color: #1f2937;
+    font-weight: 500;
+}
+
+.company_card_tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.company_card_tag {
+    background: #f3f4f6;
+    color: #4b5563;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+}
+
+.company_card_footer {
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.company_card_status {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.company_card_status--active {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.company_card_status--rejected {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.company_card_status--accepted {
+    background: #d1fae5;
+    color: #059669;
+}
+.company_card_avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-right: 12px;
+}
+
+.company_card_header {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.company_card_info {
+    flex: 1;
+}
