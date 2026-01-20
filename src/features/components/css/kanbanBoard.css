@@ -3,6 +3,7 @@
   height: 100%;
   color: white;
 
+
 }
 .dash__kanban {
   background-color: #000000;
@@ -47,18 +48,18 @@
 .dash__kanban:hover::before {
   opacity: 1;
 }
-/* features/components/css/kanbanBoard.css */
+
 
 .kanban-board {
     display: flex;
     gap: 16px;
     padding: 20px;
-    overflow-x: auto; /* Horizontalni scroll ako ne stane */
-    height: calc(100vh - 160px); /* Prilagodi visinu */
-    align-items: flex-start; /* Poravnaj na vrh */
+    overflow-x: auto; 
+    height: calc(100vh - 160px); 
+    align-items: flex-start;
 }
 
-/* Stil za scrollbar (opcionalno) */
+
 .kanban-board::-webkit-scrollbar {
     height: 8px;
 }

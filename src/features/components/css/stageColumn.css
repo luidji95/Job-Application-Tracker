@@ -1,6 +1,23 @@
 /* features/components/css/stageColumn.css */
 
 
+.stage_column {
+  flex: 0 0 244px;    
+  width: 244px;
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 .stage_column_header {
     padding: 16px;
@@ -11,6 +28,7 @@
     justify-content: space-between;
     background: white;
     border-bottom: 1px solid #e5e7eb;
+
 }
 
 .stage_column_header h3 {

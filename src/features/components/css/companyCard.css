@@ -1,4 +1,4 @@
-/* features/components/css/companyCard.css */
+
 
 .company_card {
     background: white;
@@ -9,6 +9,7 @@
     border-left: 4px solid #4f46e5;
     transition: all 0.2s ease;
     cursor: move; /* Za drag & drop */
+    max-width: 220px;
 }
 
 .company_card:hover {
