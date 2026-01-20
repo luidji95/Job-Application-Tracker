@@ -95,37 +95,153 @@
 .toolbar-search {
   flex: 1;
   max-width: 420px;
+  position: relative;
 }
 
 .toolbar-search input {
   width: 100%;
-  padding: 10px 12px;
+  padding: 10px 12px 10px 40px; 
   border-radius: 8px;
   border: 1px solid #d9d9d9;
   outline: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
 }
 
+.toolbar-search input:focus {
+  border-color: rgba(20, 184, 166, 0.8);
+  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2);
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.6);
+  width: 18px;
+  height: 18px;
+  pointer-events: none; /* Da ne blokira klik na input */
+}
+
+/* Placeholder stil */
+.toolbar-search input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Hover efekat */
+.toolbar-search:hover .search-icon {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Dark theme varijanta ako ti treba */
+.toolbar-search.dark input {
+  background: white;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+.toolbar-search.dark .search-icon {
+  color: #666;
+}
+
+.toolbar-search.dark input::placeholder {
+  color: #999;
+}
+
+/* Dugmići u toolbar-u */
 .toolbar-actions {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.toolbar-actions button {
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  background: white;
+/* Generalne stilove za btnn klasu */
+.btnn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: none;
   cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 44px;
 }
 
-.toolbar-actions button:hover {
-  opacity: 0.9;
+/* Prvo dugme - New Application */
+.btnn:first-child {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+.btnn:first-child:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(102, 126, 234, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Drugo dugme - Add stage */
+.btnn:last-child {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btnn:last-child:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Ikonice unutar dugmića */
+.btnn svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+
+.btnn:hover svg {
+  transform: scale(1.1);
+}
+
+/* Active state */
+.btnn:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+}
+
+/* Responsive za manje ekrane */
+@media (max-width: 768px) {
+  .btnn {
+    padding: 10px 16px;
+    font-size: 13px;
+    min-height: 40px;
+  }
+  
+  .btnn svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 .profile-name {
   max-width: 160px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.btnn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 

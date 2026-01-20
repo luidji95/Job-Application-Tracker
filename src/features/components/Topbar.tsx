@@ -4,6 +4,7 @@ import { supabase } from "../../lib/supabaseClient";
 import "./css/topbar.css";
 
 import { LogOut, Search, Plus } from "lucide-react";
+import { Button } from "../../components/ui/Button";
 
 type TopbarProps = {
   userName: string;
@@ -41,13 +42,29 @@ export const Topbar = ({ userName }: TopbarProps) => {
 
       <div className="topbar-toolbar">
         <div className="toolbar-search">
-          <input type="text" placeholder="Search jobs"  /><Search></Search>
+          <Search className="search-icon"></Search>
+          <input type="text" placeholder="Search jobs"></input>
           
         </div>
 
         <div className="toolbar-actions">
-          <button>Add job</button>
-          <button>Add column</button>
+          <Button 
+           variant="primary" 
+           size="md"
+            className="toolbar-btn"
+          >
+            <Plus size={16} /> 
+            <span style={{ marginLeft: "8px" }}>New Application</span>
+           </Button>
+  
+          <Button 
+            variant="primary" 
+            size="md"
+            className="toolbar-btn"
+          >
+          <Plus size={16} />
+          <span style={{ marginLeft: "8px" }}>Add stage</span>
+          </Button>
         </div>
       </div>
 
