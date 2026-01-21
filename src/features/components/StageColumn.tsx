@@ -19,44 +19,60 @@ export type JobType = {
   stage: StageId;
   appliedDate: string;
   status: StatusVariant;
+
+  rejectedFromStage?: StageId | null;
+  acceptedAt?: string;
+
   salary?: string;
   location?: string;
   tags?: string[];
 };
 
 type StageColumnProps = {
-  id: StageId;            
+  id: StageId;
   title: string;
   color: string;
   jobs: JobType[];
-  onAddJob?: (stageId: StageId) => void;   
+  onAddJob?: (stageId: StageId) => void;
+  onMoveJob?: (jobId: string, toStage: StageId) => void; // ✅ dodato
 };
 
-export const StageColumn = ({ id, title, color, jobs, onAddJob }: StageColumnProps) => {
+export const StageColumn = ({
+  id,
+  title,
+  color,
+  jobs,
+  onAddJob,
+  onMoveJob,
+}: StageColumnProps) => {
+  const isApplied = id === "applied"; // ✅ fix
+
   return (
     <div className="stage_column" data-stage={id}>
-        <div className="stage_column_header" style={{ borderTopColor: color }}>
-            <h3>{title}</h3>
-            <span className="jobs_column_count">{jobs.length}</span>
+      <div className="stage_column_header" style={{ borderTopColor: color }}>
+        <h3>{title}</h3>
+        <span className="jobs_column_count">{jobs.length}</span>
 
-            {onAddJob && (
-            <button
-                className="stage_column_add_btn"
-                onClick={() => onAddJob(id)}
-                title={`Add job to ${title}`}
-                aria-label={`Add job to ${title}`}
-                type="button"
-            >
-                <Plus />
-            </button>
-            )}
-        </div>
+        {isApplied && onAddJob && (
+          <button
+            className="stage_column_add_btn"
+            onClick={() => onAddJob(id)}
+            title={`Add job to ${title}`}
+            aria-label={`Add job to ${title}`}
+            type="button"
+          >
+            <Plus />
+          </button>
+        )}
+      </div>
 
       <div className="stage_column_body">
         {jobs.length === 0 ? (
           <p className="stage_column_empty">No jobs yet</p>
         ) : (
-          jobs.map((job) => <CompanyCard key={job.id} {...job} />)
+          jobs.map((job) => (
+            <CompanyCard key={job.id} {...job} onMove={onMoveJob} />
+          ))
         )}
       </div>
     </div>
