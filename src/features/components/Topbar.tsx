@@ -47,7 +47,8 @@ export const Topbar = ({ userName }: TopbarProps) => {
           
         </div>
 
-        <div className="toolbar-actions">
+        {/* Ovo cu zakomentarisati za sada je AddNewApplication logiku cu da implementiram na kartici applied u StageColumn}
+        {/* <div className="toolbar-actions">
           <Button 
            variant="primary" 
            size="md"
@@ -65,7 +66,7 @@ export const Topbar = ({ userName }: TopbarProps) => {
           <Plus size={16} />
           <span style={{ marginLeft: "8px" }}>Add stage</span>
           </Button>
-        </div>
+        </div> */}
       </div>
 
       

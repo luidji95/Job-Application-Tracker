@@ -3,9 +3,11 @@ import "./css/kanbanBoard.css";
 import { DUMMY_JOBS } from "../../data/dummyData";
 import { DEFAULT_STAGES } from "../../data/dummyData";
 import { StageColumn, type JobType, type StageId } from "./StageColumn";
+import { NewApplicationModal } from "./NewAplicatonModal";
 
 export const KanbanBoard = () => {
   const [jobs, setJobs] = useState<JobType[]>(DUMMY_JOBS);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const moveJob = (jobId: string, toStage: StageId) => {
     setJobs((prevJobs) =>
@@ -59,6 +61,7 @@ export const KanbanBoard = () => {
   };
 
   return (
+  <>
     <div className="kanban-board">
       {DEFAULT_STAGES.map((s) => (
         <StageColumn
@@ -67,12 +70,20 @@ export const KanbanBoard = () => {
           title={s.title}
           color={s.color}
           jobs={jobs.filter((job) => job.stage === s.id)}
-          onAddJob={(stageId) => console.log("Add job to:", stageId)}
+          onAddJob={() => setModalOpen(true)}
           onMoveJob={moveJob}
           onRestoreJob={restoreJob}
           allStages={DEFAULT_STAGES}
         />
       ))}
     </div>
-  );
+
+    {modalOpen && (
+      <NewApplicationModal
+        onClose={() => setModalOpen(false)}
+      />
+    )}
+  </>
+);
+
 };

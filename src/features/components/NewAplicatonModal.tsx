@@ -1,6 +1,10 @@
 import "./css/newApplicationModal.css";
 
-export const NewApplicationModal = () => {
+type Props = {
+  onClose: () => void;
+};
+
+export const NewApplicationModal = ({ onClose }: Props) => {
   return (
     <div className="modal-backdrop" role="dialog" aria-modal="true">
       <div className="modal-card">
@@ -10,7 +14,12 @@ export const NewApplicationModal = () => {
             <p>Add details for a new job you applied for.</p>
           </div>
 
-          <button className="modal-close" type="button" aria-label="Close">
+          <button
+            className="modal-close"
+            type="button"
+            aria-label="Close"
+            onClick={onClose}
+          >
             ✕
           </button>
         </div>
@@ -57,9 +66,14 @@ export const NewApplicationModal = () => {
           </div>
 
           <div className="modal-actions">
-            <button className="btn btn-ghost" type="button">
+            <button
+              className="btn btn-ghost"
+              type="button"
+              onClick={onClose}
+            >
               Cancel
             </button>
+
             <button className="btn btn-primary" type="submit">
               Add application
             </button>
