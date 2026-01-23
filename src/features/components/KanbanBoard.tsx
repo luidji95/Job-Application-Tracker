@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./css/kanbanBoard.css";
-import { DEFAULT_STAGES, DUMMY_JOBS } from "./dummyData";
+import { DUMMY_JOBS } from "../../data/dummyData";
+import { DEFAULT_STAGES } from "../../data/dummyData";
 import { StageColumn, type JobType, type StageId } from "./StageColumn";
 
 export const KanbanBoard = () => {
