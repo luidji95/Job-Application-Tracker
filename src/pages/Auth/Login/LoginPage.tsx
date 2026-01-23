@@ -82,7 +82,7 @@ export const LoginPage = () => {
       
 
       // Upsert - Azuriranje profila
-      // uvek osiguraj da red postoji
+      
       await supabase.from("profiles").upsert({ id: user.id, email: user.email }, { onConflict: "id" });
 
         const pending = getPendingProfile();
