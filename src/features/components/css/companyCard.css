@@ -174,3 +174,82 @@
 .company_card_info {
     flex: 1;
 }
+
+
+.company_card_menu {
+  position: relative;
+}
+
+.menu_btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu_btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.card_menu {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  min-width: 160px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 6px;
+  z-index: 30;
+}
+
+.card_menu_item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 10px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  color: #111827;
+}
+
+.card_menu_item:hover {
+  background: #f3f4f6;
+}
+
+.card_menu_item--submenu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.submenu_arrow {
+  color: #6b7280;
+  font-size: 16px;
+}
+.card_submenu {
+  position: absolute;
+  top: 100%; /* Ide ispod parent menija */
+  left: 0; /* Počinje od leve ivice parenta */
+  margin-top: 4px; /* Mali razmak */
+  min-width: 170px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 6px;
+  z-index: 31;
+}
+
+

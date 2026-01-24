@@ -3,7 +3,7 @@ import "./css/kanbanBoard.css";
 import { DUMMY_JOBS } from "../../data/dummyData";
 import { DEFAULT_STAGES } from "../../data/dummyData";
 import { StageColumn, type JobType, type StageId } from "./StageColumn";
-import { NewApplicationModal } from "./NewAplicatonModal";
+import { NewApplicationModal } from "./ModalComponents/NewApplicatonModal";
 
 export const KanbanBoard = () => {
   const [jobs, setJobs] = useState<JobType[]>(DUMMY_JOBS);

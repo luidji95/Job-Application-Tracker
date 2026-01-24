@@ -1,7 +1,6 @@
+import { useEffect, useRef, useState } from "react";
 import "./css/companyCard.css";
 import type { JobType, StageId } from "./StageColumn";
-
-// type StatusVariant = "active" | "accepted" | "rejected";
 
 type StageOption = {
   id: StageId;
@@ -11,6 +10,10 @@ type StageOption = {
 type CompanyCardProps = JobType & {
   onMove?: (jobId: string, toStage: StageId) => void;
   onRestore?: (jobId: string) => void;
+
+  onEdit?: (jobId: string) => void;
+  onDelete?: (jobId: string) => void;
+
   allStages: StageOption[];
 };
 
@@ -27,13 +30,18 @@ const getCompanyColor = (name: string) => {
     "#dcff13",
   ];
 
-  const index = name.charCodeAt(0) % colors.length;
+  const safe = (name ?? "").trim();
+  const index = safe ? safe.charCodeAt(0) % colors.length : 0;
   return colors[index];
 };
 
 const getCompanyInitials = (name: string) => {
-  return name
+  const safe = (name ?? "").trim();
+  if (!safe) return "??";
+
+  return safe
     .split(" ")
+    .filter(Boolean)
     .map((word) => word[0])
     .join("")
     .toUpperCase()
@@ -53,47 +61,40 @@ export const CompanyCard = ({
   rejectedFromStage,
   onMove,
   onRestore,
+  onEdit,
+  onDelete,
   allStages,
 }: CompanyCardProps) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [moveOpen, setMoveOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  // close on outside click
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      if (!menuRef.current) return;
+      if (!menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+        setMoveOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
+
+  const stageOptions = allStages.filter((s) => s.id !== stage);
+
+  const handleMove = (toStage: StageId) => {
+    onMove?.(id, toStage);
+    setMenuOpen(false);
+    setMoveOpen(false);
+  };
+
   return (
     <div className={`company_card company_card--${status}`} data-id={id}>
       {/* HEADER */}
       <div className="company_card_header">
-        {/* MOVE / RESTORE CONTROL */}
-        <div className="company_card_move">
-          {stage === "rejected" ? (
-            <button
-              className="restore_btn"
-              onClick={() => onRestore?.(id)}
-            >
-              Restore
-            </button>
-          ) : (
-            <select
-              defaultValue=""
-              onChange={(e) => {
-                const toStage = e.target.value as StageId;
-                if (!toStage) return;
-                onMove?.(id, toStage);
-                e.currentTarget.value = "";
-              }}
-            >
-              <option value="" disabled>
-                Move to...
-              </option>
-
-              {allStages
-                .filter((s) => s.id !== stage)
-                .map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.title}
-                  </option>
-                ))}
-            </select>
-          )}
-        </div>
-
-        {/* COMPANY INFO */}
         <div className="company_card_info">
           <div
             className="company_card_avatar"
@@ -109,8 +110,97 @@ export const CompanyCard = ({
           </div>
         </div>
 
-        <div className="company_card_menu">
-          <button className="menu_btn">⋯</button>
+        {/* MENU */}
+        <div className="company_card_menu" ref={menuRef}>
+          <button
+            className="menu_btn"
+            type="button"
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            onClick={(e) => {
+              e.stopPropagation();
+              setMenuOpen((p) => !p);
+              setMoveOpen(false);
+            }}
+          >
+            ⋯
+          </button>
+
+          {menuOpen && (
+            <div className="card_menu" role="menu" onClick={(e) => e.stopPropagation()}>
+              <button
+                type="button"
+                className="card_menu_item"
+                role="menuitem"
+                onClick={() => {
+                  onEdit?.(id);
+                  setMenuOpen(false);
+                  setMoveOpen(false);
+                }}
+              >
+                Edit
+              </button>
+
+              <button
+                type="button"
+                className="card_menu_item"
+                role="menuitem"
+                onClick={() => {
+                  onDelete?.(id);
+                  setMenuOpen(false);
+                  setMoveOpen(false);
+                }}
+              >
+                Delete
+              </button>
+
+              {stage === "rejected" ? (
+                <button
+                  type="button"
+                  className="card_menu_item"
+                  role="menuitem"
+                  onClick={() => {
+                    onRestore?.(id);
+                    setMenuOpen(false);
+                    setMoveOpen(false);
+                  }}
+                >
+                  Restore
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="card_menu_item card_menu_item--submenu"
+                  role="menuitem"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMoveOpen((p) => !p);
+                  }}
+                >
+                  Move to <span className="submenu_arrow">›</span>
+                </button>
+              )}
+
+              {moveOpen && stage !== "rejected" && (
+                <div className="card_submenu" role="menu">
+                  {stageOptions.map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      className="card_menu_item"
+                      role="menuitem"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMove(s.id);
+                      }}
+                    >
+                      {s.title}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

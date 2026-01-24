@@ -1,4 +1,4 @@
-import "./css/newApplicationModal.css";
+import "../css/newAplicationModal.css";
 
 type Props = {
   onClose: () => void;

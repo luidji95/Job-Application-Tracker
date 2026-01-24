@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabaseClient";
 import "./css/topbar.css";
 
-import { LogOut, Search, Plus } from "lucide-react";
-import { Button } from "../../components/ui/Button";
+import { LogOut, Search } from "lucide-react";
+// import { Button } from "../../components/ui/Button";
 
 type TopbarProps = {
   userName: string;
