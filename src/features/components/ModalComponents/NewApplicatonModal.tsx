@@ -1,10 +1,40 @@
 import "../css/newAplicationModal.css";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { newJobSchema } from "../../../schemas/newJobSchema";
+import type { z } from "zod";
+
+type NewJobData = z.infer<typeof newJobSchema>;
 
 type Props = {
   onClose: () => void;
+  onSubmit: (data: NewJobData) => void;
 };
 
-export const NewApplicationModal = ({ onClose }: Props) => {
+export const NewApplicationModal = ({ onClose, onSubmit }: Props) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<NewJobData>({
+    resolver: zodResolver(newJobSchema),
+    defaultValues: {
+      company: "",
+      position: "",
+      location: "",
+      salary: "",
+      tags: "",
+      notes: "",
+    },
+  });
+
+  const handleFormSubmit = (data: NewJobData) => {
+    onSubmit(data);
+    reset();
+    onClose();
+  };
+
   return (
     <div className="modal-backdrop" role="dialog" aria-modal="true">
       <div className="modal-card">
@@ -24,36 +54,61 @@ export const NewApplicationModal = ({ onClose }: Props) => {
           </button>
         </div>
 
-        <form className="modal-form">
+        <form 
+          className="modal-form" 
+          onSubmit={handleSubmit(handleFormSubmit)}
+        >
           <div className="form-grid">
             <div className="field">
               <label>Company</label>
-              <input type="text" placeholder="e.g. Microsoft" />
+              <input 
+                type="text" 
+                placeholder="e.g. Microsoft" 
+                {...register("company")} 
+              />
+              {errors.company && (
+                <span className="field-error">{errors.company.message}</span>
+              )}
             </div>
 
             <div className="field">
               <label>Position</label>
-              <input type="text" placeholder="e.g. Frontend Developer" />
+              <input 
+                type="text" 
+                placeholder="e.g. Frontend Developer" 
+                {...register("position")} 
+              />
+              {errors.position && (
+                <span className="field-error">{errors.position.message}</span>
+              )}
             </div>
 
             <div className="field">
               <label>Location</label>
-              <input type="text" placeholder="e.g. Belgrade / Remote" />
+              <input 
+                type="text" 
+                placeholder="e.g. Belgrade / Remote" 
+                {...register("location")} 
+              />
             </div>
 
             <div className="field">
               <label>Salary</label>
-              <input type="text" placeholder="e.g. 2000€ / 60k" />
+              <input 
+                type="text" 
+                placeholder="e.g. 2000€ / 60k" 
+                {...register("salary")} 
+              />
             </div>
 
             <div className="field field-full">
               <label>Tags</label>
-              <input type="text" placeholder="e.g. remote, react, referral" />
-              <div className="tags-preview">
-                <span className="tag-chip">remote</span>
-                <span className="tag-chip">react</span>
-                <span className="tag-chip">referral</span>
-              </div>
+              <input 
+                type="text" 
+                placeholder="e.g. remote, react, referral" 
+                {...register("tags")} 
+              />
+              <p className="field-hint">Separate with commas</p>
             </div>
 
             <div className="field field-full">
@@ -61,6 +116,7 @@ export const NewApplicationModal = ({ onClose }: Props) => {
               <textarea
                 rows={4}
                 placeholder="Links, recruiter name, next steps, etc."
+                {...register("notes")} 
               />
             </div>
           </div>
@@ -70,12 +126,17 @@ export const NewApplicationModal = ({ onClose }: Props) => {
               className="btn btn-ghost"
               type="button"
               onClick={onClose}
+              disabled={isSubmitting}
             >
               Cancel
             </button>
 
-            <button className="btn btn-primary" type="submit">
-              Add application
+            <button 
+              className="btn btn-primary" 
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Adding..." : "Add application"}
             </button>
           </div>
         </form>

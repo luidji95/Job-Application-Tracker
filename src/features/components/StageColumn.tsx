@@ -42,6 +42,8 @@ type StageColumnProps = {
   onAddJob?: (stageId: StageId) => void;
   onMoveJob?: (jobId: string, toStage: StageId) => void;
   onRestoreJob?: (jobId: string) => void;
+  onEditJob?: (jobId: string) => void;
+  onDeleteJob?: (jobId: string) => void;
 
   allStages: StageOption[];
 };
@@ -54,6 +56,8 @@ export const StageColumn = ({
   onAddJob,
   onMoveJob,
   onRestoreJob,
+  onEditJob,
+  onDeleteJob,
   allStages,
 }: StageColumnProps) => {
   const isApplied = id === "applied";
@@ -87,6 +91,8 @@ export const StageColumn = ({
               {...job}
               onMove={onMoveJob}
               onRestore={onRestoreJob}
+              onEdit={onEditJob}
+              onDelete={onDeleteJob}
               allStages={allStages}
             />
           ))
