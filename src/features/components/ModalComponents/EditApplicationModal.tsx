@@ -19,7 +19,7 @@ type EditJobData = z.infer<typeof editJobSchema>;
 type Props = {
   onClose: () => void;
   onSubmit: (data: EditJobData) => void;
-  job: JobType; // Postojeći podaci
+  job: JobType; 
 };
 
 export const EditApplicationModal = ({ onClose, onSubmit, job }: Props) => {
@@ -36,7 +36,7 @@ export const EditApplicationModal = ({ onClose, onSubmit, job }: Props) => {
       location: job.location || "",
       salary: job.salary || "",
       tags: job.tags?.join(", ") || "",
-      notes: "", // Možeš da dodaš notes field ako ga nemaš
+      notes: "", 
     },
   });
 

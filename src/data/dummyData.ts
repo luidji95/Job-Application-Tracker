@@ -1,4 +1,4 @@
-import type { JobType, StageId } from "./StageColumn";
+import type { JobType, StageId } from "../features/components/StageColumn";
 
 export const DUMMY_JOBS: JobType[] = [
     {
