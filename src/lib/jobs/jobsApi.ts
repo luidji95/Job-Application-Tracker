@@ -46,3 +46,6 @@ export async function fetchJobs(userId: string): Promise<JobType[]> {
     tags: row.tags ?? undefined,
   }));
 }
+
+
+
