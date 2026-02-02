@@ -1,7 +1,8 @@
 import { supabase } from "../lib/supabaseClient";
 import { DUMMY_JOBS } from "../data/dummyData";
+import type { JobType } from "../features/components/StageColumn";
 
-// DB row shape (samo kolone koje postoje u tabeli)
+// DB row shape - striktno za Supabase insert
 type JobRowInsert = {
   user_id: string;
   stage: string;
@@ -15,56 +16,34 @@ type JobRowInsert = {
   applied_date: string; 
   rejected_from_stage: string | null;
 };
-type DummyJob = {
-  company_name?: string;
-  company?: string;
-  position?: string;
-  title?: string;
-  stage?: string;
-  status?: string;
-  location?: string;
-  salary?: string;
-  tags?: string | string[];
-  notes?: string;
-  applied_date?: string;
-  rejected_from_stage?: string;
-};
 
-
-
-// helpers
+// helpers 
 const toLowerSafe = (v: unknown) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 
 const normalizeStage = (stage: unknown) => {
   const s = toLowerSafe(stage);
-  const allowed = new Set(["applied", "hr-interview", "tecnical", "final", "offer", "rejected"]);
-  if (allowed.has(s)) return s;
-  // fallback
-  return "applied";
+  const allowed = new Set(["applied", "hr-interview", "technical", "final", "offer", "rejected"]);
+  return allowed.has(s) ? s : "applied";
 };
 
 const normalizeStatus = (status: unknown) => {
   const s = toLowerSafe(status);
   const allowed = new Set(["active", "accepted", "rejected"]);
-  if (allowed.has(s)) return s;
-  return "active";
+  return allowed.has(s) ? s : "active";
 };
 
 const normalizeTags = (tags: unknown): string[] => {
-  // DB je text[] => MORA biti array stringova
   if (Array.isArray(tags)) {
     return tags
       .map((t) => (typeof t === "string" ? t.trim() : ""))
       .filter(Boolean);
   }
-
   if (typeof tags === "string") {
     return tags
       .split(",")
       .map((t) => t.trim())
       .filter(Boolean);
   }
-
   return [];
 };
 
@@ -76,61 +55,53 @@ const pickStringOrNull = (v: unknown) => {
 
 export const seedDummyJobs = async (tableName: string = "jobs") => {
   try {
-    // 1 Pronalazimo trenutno logovanog usera
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) throw new Error("Morate biti ulogovani da biste seedovali poslove.");
 
-    if (userError || !user) {
-      throw new Error("Morate biti ulogovani da biste seedovali poslove.");
-    }
-
-    // 2 brisemo samo user-ove jobove
-    const { error: deleteError } = await supabase
+    // Proveri da li vec postoji makar 1 job
+    const { count, error: countError } = await supabase
       .from(tableName)
-      .delete()
+      .select("id", { count: "exact", head: true })
       .eq("user_id", user.id);
 
-    if (deleteError) throw deleteError;
+    if (countError) throw countError;
 
-    // 3 map dummy -> DB rows
+    //Ako ima bar 1 - ne seeduj
+    if ((count ?? 0) > 0) {
+      return {
+        success: false,
+        count: 0,
+        message: `Seed blocked: already have ${count} jobs. Delete all jobs first.`,
+      };
+    }
+
+    //  Ako je 0 - seeduj
     const nowIso = new Date().toISOString();
 
-    const rows: JobRowInsert[] = DUMMY_JOBS.map((job: DummyJob) => {
+    const rows: JobRowInsert[] = DUMMY_JOBS.map((job: JobType) => {
       const status = normalizeStatus(job.status);
       const stage = normalizeStage(job.stage);
 
-      const companyName =
-        typeof job.company_name === "string"
-          ? job.company_name.trim()
-          : typeof job.company === "string"
-          ? job.company.trim()
-          : "";
-
-      const position =
-        typeof job.position === "string"
-          ? job.position.trim()
-          : typeof job.title === "string"
-          ? job.title.trim()
-          : "";
+      const companyName = job.company_name?.trim() || "Unknown Company";
+      const position = job.position?.trim() || "Unknown Position";
 
       return {
         user_id: user.id,
-        company_name: companyName || "Unknown Company",
-        position: position || "Unknown Position",
+        company_name: companyName,
+        position,
         stage,
         status,
         location: pickStringOrNull(job.location),
-        salary: pickStringOrNull(job.salary), 
-        tags: normalizeTags(job.tags), 
+        salary: pickStringOrNull(job.salary),
+        tags: normalizeTags(job.tags),
         notes: pickStringOrNull(job.notes),
-        applied_date: typeof job.applied_date === "string" ? job.applied_date : nowIso,
-        rejected_from_stage: status === "rejected" ? normalizeStage(job.rejected_from_stage ?? stage) : null,
+        applied_date: job.applied_date || nowIso,
+        rejected_from_stage: status === "rejected"
+          ? normalizeStage(job.rejected_from_stage ?? stage)
+          : null,
       };
     });
 
-    // 4 insert u bazu 
     const { data: insertedJobs, error: insertError } = await supabase
       .from(tableName)
       .insert(rows)
@@ -145,12 +116,7 @@ export const seedDummyJobs = async (tableName: string = "jobs") => {
       jobs: insertedJobs,
     };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Doslo je do greske';
-    return {
-      success: false,
-      count: 0,
-      message,
-      error,
-    };
+    const message = error instanceof Error ? error.message : "Doslo je do greske";
+    return { success: false, count: 0, message, error };
   }
 };

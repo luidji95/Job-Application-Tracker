@@ -4,14 +4,16 @@ import { supabase } from "../../lib/supabaseClient";
 import "./css/topbar.css";
 
 import { LogOut, Search } from "lucide-react";
-// import { Button } from "../../components/ui/Button";
+import { Button} from "../../components/ui/Button";
+import { Plus } from "lucide-react";
 
 type TopbarProps = {
   userName: string;
   avatarUrl?: string;
+  onSeedClick?: () => void;
 };
 
-export const Topbar = ({ userName }: TopbarProps) => {
+export const Topbar = ({ userName, onSeedClick }: TopbarProps) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -47,8 +49,8 @@ export const Topbar = ({ userName }: TopbarProps) => {
           
         </div>
 
-        {/* Ovo cu zakomentarisati za sada je AddNewApplication logiku cu da implementiram na kartici applied u StageColumn}
-        {/* <div className="toolbar-actions">
+        
+         <div className="toolbar-actions">
           <Button 
            variant="primary" 
            size="md"
@@ -62,11 +64,12 @@ export const Topbar = ({ userName }: TopbarProps) => {
             variant="primary" 
             size="md"
             className="toolbar-btn"
+            onClick={onSeedClick}
           >
           <Plus size={16} />
-          <span style={{ marginLeft: "8px" }}>Add stage</span>
+          <span style={{ marginLeft: "8px" }}>Seed</span>
           </Button>
-        </div> */}
+        </div> 
       </div>
 
       

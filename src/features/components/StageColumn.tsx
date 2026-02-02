@@ -14,18 +14,19 @@ export type StageId =
 
 export type JobType = {
   id: string;
-  companyName: string;
+  company_name: string;
   position: string;
   stage: StageId;
-  appliedDate: string;
+  applied_date: string;
   status: StatusVariant;
 
-  rejectedFromStage?: StageId | null;
-  acceptedAt?: string;
+  rejected_from_stage?: StageId | null;
+  accepted_at?: string;
 
   salary?: string;
   location?: string;
   tags?: string[];
+  notes?: string;
 };
 
 type StageOption = {

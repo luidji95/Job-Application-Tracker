@@ -3,10 +3,10 @@ import type { JobType, StageId } from "../features/components/StageColumn";
 export const DUMMY_JOBS: JobType[] = [
     {
         id: '1',
-        companyName: 'Google',
+        company_name: 'Google',          // ← promenjeno iz companyName
         position: 'Frontend Developer',
         stage: 'applied',
-        appliedDate: '2024-01-15',
+        applied_date: '2024-01-15',      // ← promenjeno iz appliedDate
         status: 'active' as const,
         salary: '$120,000',
         location: 'Remote',
@@ -14,10 +14,10 @@ export const DUMMY_JOBS: JobType[] = [
     },
     {
         id: '2',
-        companyName: 'Microsoft',
+        company_name: 'Microsoft',
         position: 'Full Stack Engineer',
         stage: 'applied',
-        appliedDate: '2024-01-10',
+        applied_date: '2024-01-10',
         status: 'active' as const,
         salary: '$110,000',
         location: 'Seattle, WA',
@@ -25,30 +25,30 @@ export const DUMMY_JOBS: JobType[] = [
     },
     {
         id: '3',
-        companyName: 'Amazon',
+        company_name: 'Amazon',
         position: 'Backend Developer',
         stage: 'hr-interview',
-        appliedDate: '2024-01-05',
+        applied_date: '2024-01-05',
         status: 'active' as const,
         salary: '$115,000',
         location: 'New York, NY'
     },
     {
         id: '4',
-        companyName: 'Startup XYZ',
+        company_name: 'Startup XYZ',
         position: 'React Developer',
         stage: 'rejected',
-        appliedDate: '2023-12-20',
+        applied_date: '2023-12-20',
         status: 'rejected' as const,
         salary: '$90,000',
         location: 'Remote'
     },
     {
         id: '5',
-        companyName: 'Apple',
+        company_name: 'Apple',
         position: 'iOS Developer',
         stage: 'offer',
-        appliedDate: '2024-01-12',
+        applied_date: '2024-01-12',
         status: 'accepted' as const,
         salary: '$130,000',
         location: 'Cupertino, CA',

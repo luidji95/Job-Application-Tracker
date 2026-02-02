@@ -59,7 +59,7 @@ export const KanbanBoard = () => {
     loadUser();
   }, []);
 
-  // Kad userId postoji → povuci jobs iz baze
+  // Kad userId postoji  povuci jobs iz baze
   useEffect(() => {
     if (!userId) return;
 
@@ -72,7 +72,7 @@ export const KanbanBoard = () => {
         console.log("FETCHED JOBS:", data);
 
 
-        // fetchJobs treba da vrati JobType[] (ili mapirano na JobType)
+        
         setJobs(data ?? []);
       } catch (e: unknown) {
         const message = e instanceof Error ? e.message : "Unknown error";
@@ -97,7 +97,7 @@ export const KanbanBoard = () => {
             ...job,
             stage: "rejected",
             status: "rejected",
-            rejectedFromStage: fromStage,
+            rejected_from_stage: fromStage,
           };
         }
 
@@ -106,7 +106,7 @@ export const KanbanBoard = () => {
             ...job,
             stage: toStage,
             status: "active",
-            rejectedFromStage: null,
+            rejected_from_stage: null,
           };
         }
 
@@ -124,7 +124,7 @@ export const KanbanBoard = () => {
         if (job.id !== jobId) return job;
         if (job.stage !== "rejected") return job;
 
-        const backTo = job.rejectedFromStage ?? "applied";
+        const backTo = job.rejected_from_stage ?? "applied";
 
         return {
           ...job,
@@ -136,11 +136,11 @@ export const KanbanBoard = () => {
     );
   };
 
-  // ADD: lokalno dodavanje (za sad)
+  //  lokalno dodavanje (za sad)
   const addJob = (jobData: NewJobData) => {
     const newJob: JobType = {
       id: crypto.randomUUID(),
-      companyName: jobData.company,
+      company_name: jobData.company,
       position: jobData.position,
       location: jobData.location || undefined,
       salary: jobData.salary || undefined,
@@ -149,7 +149,7 @@ export const KanbanBoard = () => {
         : undefined,
       stage: "applied",
       status: "active",
-      appliedDate: new Date().toISOString(),
+      applied_date: new Date().toISOString(),
     };
 
     setJobs((prev) => [newJob, ...prev]);
@@ -177,7 +177,7 @@ export const KanbanBoard = () => {
 
         return {
           ...job,
-          companyName: updatedData.company,
+          company_name: updatedData.company,
           position: updatedData.position,
           location: updatedData.location || undefined,
           salary: updatedData.salary || undefined,

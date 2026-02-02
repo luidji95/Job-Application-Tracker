@@ -50,15 +50,15 @@ const getCompanyInitials = (name: string) => {
 
 export const CompanyCard = ({
   id,
-  companyName,
+  company_name,
   position,
-  appliedDate,
+  applied_date,
   location,
   stage,
   salary,
   tags = [],
   status,
-  rejectedFromStage,
+  rejected_from_stage,
   onMove,
   onRestore,
   onEdit,
@@ -98,13 +98,13 @@ export const CompanyCard = ({
         <div className="company_card_info">
           <div
             className="company_card_avatar"
-            style={{ backgroundColor: getCompanyColor(companyName) }}
+            style={{ backgroundColor: getCompanyColor(company_name) }}
           >
-            {getCompanyInitials(companyName)}
+            {getCompanyInitials(company_name)}
           </div>
 
           <div className="company_card_text">
-            <h4>{companyName}</h4>
+            <h4>{company_name}</h4>
             <p>{position}</p>
             {location && <p>📍 {location}</p>}
           </div>
@@ -209,7 +209,7 @@ export const CompanyCard = ({
         <div className="details_item">
           <span className="detail_label">Applied:</span>
           <span className="detail_value">
-            {new Date(appliedDate).toLocaleDateString()}
+            {new Date(applied_date).toLocaleDateString()}
           </span>
         </div>
 
@@ -218,10 +218,10 @@ export const CompanyCard = ({
           <span className="detail_value">{stage}</span>
         </div>
 
-        {status === "rejected" && rejectedFromStage && (
+        {status === "rejected" && rejected_from_stage && (
           <div className="details_item">
             <span className="detail_label">Rejected at:</span>
-            <span className="detail_value">{rejectedFromStage}</span>
+            <span className="detail_value">{rejected_from_stage}</span>
           </div>
         )}
 

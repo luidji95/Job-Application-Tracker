@@ -34,11 +34,11 @@ export async function fetchJobs(userId: string): Promise<JobType[]> {
 
   return rows.map((row) => ({
     id: row.id,
-    companyName: row.company_name,
+    company_name: row.company_name,
     position: row.position,
     stage: row.stage,
     status: row.status,
-    appliedDate: row.applied_date,
+    applied_date: row.applied_date,
     rejectedFromStage: row.rejected_from_stage ?? null,
     acceptedAt: row.accepted_at ?? undefined,
     location: row.location ?? undefined,
