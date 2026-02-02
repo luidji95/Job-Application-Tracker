@@ -11,7 +11,7 @@ import { fetchJobs } from "../../lib/jobs/jobsApi";
 
 // Tip za podatke iz modala
 type NewJobData = {
-  company: string;
+  company_name: string;
   position: string;
   location?: string;
   salary?: string;
@@ -140,7 +140,7 @@ export const KanbanBoard = () => {
   const addJob = (jobData: NewJobData) => {
     const newJob: JobType = {
       id: crypto.randomUUID(),
-      company_name: jobData.company,
+      company_name: jobData.company_name,
       position: jobData.position,
       location: jobData.location || undefined,
       salary: jobData.salary || undefined,
@@ -177,7 +177,7 @@ export const KanbanBoard = () => {
 
         return {
           ...job,
-          company_name: updatedData.company,
+          company_name: updatedData.company_name,
           position: updatedData.position,
           location: updatedData.location || undefined,
           salary: updatedData.salary || undefined,

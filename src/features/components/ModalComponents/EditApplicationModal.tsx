@@ -6,7 +6,7 @@ import type { JobType } from "../StageColumn";
 
 // Koristimo istu shemu kao za new
 const editJobSchema = z.object({
-  company: z.string().min(1, "Company is required"),
+  company_name: z.string().min(1, "Company is required"),
   position: z.string().min(1, "Position is required"),
   location: z.string().optional(),
   salary: z.string().optional(),
@@ -31,7 +31,7 @@ export const EditApplicationModal = ({ onClose, onSubmit, job }: Props) => {
   } = useForm<EditJobData>({
     resolver: zodResolver(editJobSchema),
     defaultValues: {
-      company: job.companyName,
+      company_name: job.company_name,
       position: job.position,
       location: job.location || "",
       salary: job.salary || "",
@@ -52,7 +52,7 @@ export const EditApplicationModal = ({ onClose, onSubmit, job }: Props) => {
         <div className="modal-header">
           <div className="modal-title">
             <h2>Edit application</h2>
-            <p>Update details for {job.companyName}</p>
+            <p>Update details for {job.company_name}</p>
           </div>
 
           <button
@@ -75,10 +75,10 @@ export const EditApplicationModal = ({ onClose, onSubmit, job }: Props) => {
               <input 
                 type="text" 
                 placeholder="e.g. Microsoft" 
-                {...register("company")} 
+                {...register("company_name")} 
               />
-              {errors.company && (
-                <span className="field-error">{errors.company.message}</span>
+              {errors.company_name && (
+                <span className="field-error">{errors.company_name.message}</span>
               )}
             </div>
 

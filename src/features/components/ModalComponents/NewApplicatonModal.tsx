@@ -20,7 +20,7 @@ export const NewApplicationModal = ({ onClose, onSubmit }: Props) => {
   } = useForm<NewJobData>({
     resolver: zodResolver(newJobSchema),
     defaultValues: {
-      company: "",
+      company_name: "",
       position: "",
       location: "",
       salary: "",
@@ -64,10 +64,10 @@ export const NewApplicationModal = ({ onClose, onSubmit }: Props) => {
               <input 
                 type="text" 
                 placeholder="e.g. Microsoft" 
-                {...register("company")} 
+                {...register("company_name")} 
               />
-              {errors.company && (
-                <span className="field-error">{errors.company.message}</span>
+              {errors.company_name && (
+                <span className="field-error">{errors.company_name.message}</span>
               )}
             </div>
 
