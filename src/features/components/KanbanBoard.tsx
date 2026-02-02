@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import "./css/kanbanBoard.css";
 
 import { DEFAULT_STAGES } from "../../data/dummyData";
@@ -7,9 +7,16 @@ import { NewApplicationModal } from "./ModalComponents/NewApplicatonModal";
 import { EditApplicationModal } from "./ModalComponents/EditApplicationModal";
 
 import { supabase } from "../../lib/supabaseClient";
-import { fetchJobs } from "../../lib/jobs/jobsApi";
+import {
+  fetchJobs,
+  createJob,
+  updateJob,
+  deleteJobDb,
+  moveJobDb,
+  restoreJobDb,
+} from "../../lib/jobs/jobsApi";
 
-// Tip za podatke iz modala
+// Tip za podatke iz modala 
 type NewJobData = {
   company_name: string;
   position: string;
@@ -31,7 +38,13 @@ export const KanbanBoard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Ucitavamo userId iz session-a (auth)
+  // Helper: refetch jobs (single source of truth)
+  const refetch = useCallback(async (uid: string) => {
+    const data = await fetchJobs(uid);
+    setJobs(data ?? []);
+  }, []);
+
+  //  Ucitavamo userId iz session-a (auth)
   useEffect(() => {
     const loadUser = async () => {
       const {
@@ -52,14 +65,12 @@ export const KanbanBoard = () => {
       }
 
       setUserId(session.user.id);
-      console.log("SESSION USER:", session.user.id);
-
     };
 
     loadUser();
   }, []);
 
-  // Kad userId postoji  povuci jobs iz baze
+  //  Kad userId postoji povuci jobs iz baze
   useEffect(() => {
     if (!userId) return;
 
@@ -67,13 +78,7 @@ export const KanbanBoard = () => {
       try {
         setError(null);
         setIsLoading(true);
-
-        const data = await fetchJobs(userId);
-        console.log("FETCHED JOBS:", data);
-
-
-        
-        setJobs(data ?? []);
+        await refetch(userId);
       } catch (e: unknown) {
         const message = e instanceof Error ? e.message : "Unknown error";
         setError(message);
@@ -83,85 +88,85 @@ export const KanbanBoard = () => {
     };
 
     loadJobs();
-  }, [userId]);
+  }, [userId, refetch]);
 
-  const moveJob = (jobId: string, toStage: StageId) => {
-    setJobs((prevJobs) =>
-      prevJobs.map((job) => {
-        if (job.id !== jobId) return job;
+  //  MOVE (persist u DB + refetch)
+  const moveJob = async (jobId: string, toStage: StageId) => {
+    if (!userId) return;
 
-        const fromStage = job.stage;
+    const current = jobs.find((j) => j.id === jobId);
+    if (!current) return;
 
-        if (toStage === "rejected") {
-          return {
-            ...job,
-            stage: "rejected",
-            status: "rejected",
-            rejected_from_stage: fromStage,
-          };
-        }
-
-        if (fromStage === "rejected") {
-          return {
-            ...job,
-            stage: toStage,
-            status: "active",
-            rejected_from_stage: null,
-          };
-        }
-
-        return {
-          ...job,
-          stage: toStage,
-        };
-      })
-    );
-  };
-
-  const restoreJob = (jobId: string) => {
-    setJobs((prevJobs) =>
-      prevJobs.map((job) => {
-        if (job.id !== jobId) return job;
-        if (job.stage !== "rejected") return job;
-
-        const backTo = job.rejected_from_stage ?? "applied";
-
-        return {
-          ...job,
-          stage: backTo,
-          status: "active",
-          rejected_from_stage: null,
-        };
-      })
-    );
-  };
-
-  //  lokalno dodavanje (za sad)
-  const addJob = (jobData: NewJobData) => {
-    const newJob: JobType = {
-      id: crypto.randomUUID(),
-      company_name: jobData.company_name,
-      position: jobData.position,
-      location: jobData.location || undefined,
-      salary: jobData.salary || undefined,
-      tags: jobData.tags
-        ? jobData.tags.split(",").map((t) => t.trim()).filter(Boolean)
-        : undefined,
-      stage: "applied",
-      status: "active",
-      applied_date: new Date().toISOString(),
-    };
-
-    setJobs((prev) => [newJob, ...prev]);
-    setModalOpen(false);
-  };
-
-  const deleteJob = (jobId: string) => {
-    if (window.confirm("Are you sure you want to delete this application?")) {
-      setJobs((prev) => prev.filter((job) => job.id !== jobId));
+    try {
+      setError(null);
+      await moveJobDb(userId, current, toStage);
+      await refetch(userId);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Failed to move job";
+      setError(message);
     }
   };
 
+  // RESTORE (persist u DB + refetch)
+  const restoreJob = async (jobId: string) => {
+    if (!userId) return;
+
+    const current = jobs.find((j) => j.id === jobId);
+    if (!current) return;
+
+    try {
+      setError(null);
+      await restoreJobDb(userId, current);
+      await refetch(userId);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Failed to restore job";
+      setError(message);
+    }
+  };
+
+  //  ADD (insert u DB + refetch)
+  const addJob = async (jobData: NewJobData) => {
+    if (!userId) return;
+
+    try {
+      setError(null);
+
+      
+      await createJob(userId, {
+        company: jobData.company_name,
+        position: jobData.position,
+        location: jobData.location,
+        salary: jobData.salary,
+        tags: jobData.tags,
+        notes: jobData.notes,
+      });
+
+      setModalOpen(false);
+      await refetch(userId);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Failed to create job";
+      setError(message);
+    }
+  };
+
+  //  DELETE (delete iz DB + refetch)
+  const deleteJob = async (jobId: string) => {
+    if (!userId) return;
+
+    const ok = window.confirm("Are you sure you want to delete this application?");
+    if (!ok) return;
+
+    try {
+      setError(null);
+      await deleteJobDb(userId, jobId);
+      await refetch(userId);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Failed to delete job";
+      setError(message);
+    }
+  };
+
+  //  EDIT open
   const editJob = (jobId: string) => {
     const jobToEdit = jobs.find((job) => job.id === jobId);
     if (jobToEdit) {
@@ -170,32 +175,33 @@ export const KanbanBoard = () => {
     }
   };
 
-  const updateJob = (jobId: string, updatedData: NewJobData) => {
-    setJobs((prevJobs) =>
-      prevJobs.map((job) => {
-        if (job.id !== jobId) return job;
+  //  UPDATE (update u DB + refetch)
+  const handleUpdateSubmit = async (data: NewJobData) => {
+    if (!userId || !editingJob) return;
 
-        return {
-          ...job,
-          company_name: updatedData.company_name,
-          position: updatedData.position,
-          location: updatedData.location || undefined,
-          salary: updatedData.salary || undefined,
-          tags: updatedData.tags
-            ? updatedData.tags.split(",").map((t) => t.trim()).filter(Boolean)
-            : undefined,
-        };
-      })
-    );
-    setEditModalOpen(false);
-    setEditingJob(null);
+    try {
+      setError(null);
+
+      await updateJob(userId, editingJob.id, {
+        company: data.company_name,
+        position: data.position,
+        location: data.location,
+        salary: data.salary,
+        tags: data.tags,
+        notes: data.notes,
+      });
+
+      setEditModalOpen(false);
+      setEditingJob(null);
+
+      await refetch(userId);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Failed to update job";
+      setError(message);
+    }
   };
 
-  const handleUpdateSubmit = (data: NewJobData) => {
-    if (editingJob) updateJob(editingJob.id, data);
-  };
-
-  // UI guard: loading/error
+  // UI guard - loading/error
   if (isLoading) {
     return <div className="kanban-board">Loading jobs...</div>;
   }
@@ -225,10 +231,7 @@ export const KanbanBoard = () => {
       </div>
 
       {modalOpen && (
-        <NewApplicationModal
-          onClose={() => setModalOpen(false)}
-          onSubmit={addJob}
-        />
+        <NewApplicationModal onClose={() => setModalOpen(false)} onSubmit={addJob} />
       )}
 
       {editModalOpen && editingJob && (
