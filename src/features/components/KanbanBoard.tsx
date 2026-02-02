@@ -130,7 +130,7 @@ export const KanbanBoard = () => {
           ...job,
           stage: backTo,
           status: "active",
-          rejectedFromStage: null,
+          rejected_from_stage: null,
         };
       })
     );
