@@ -2,6 +2,8 @@
 import { supabase } from "../supabaseClient";
 import type { StageId, JobType } from "../../features/components/StageColumn";
 
+import { normalizeStage, normalizeStatus, pickStringOrNull, normalizeTags } from "./jobUtils";
+
 export type JobRow = {
   id: string;
   user_id: string;
@@ -46,42 +48,9 @@ export type UpdateJobData = {
 
 const TABLE = "jobs";
 
-// helpers
 
-const toLowerSafe = (v: unknown) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 
-const normalizeStage = (stage: unknown): StageId => {
-  const s = toLowerSafe(stage);
-  const allowed: StageId[] = ["applied", "hr-interview", "technical", "final", "offer", "rejected"];
-  return (allowed as string[]).includes(s) ? (s as StageId) : "applied";
-};
 
-const normalizeStatus = (status: unknown): JobType["status"] => {
-  const s = toLowerSafe(status);
-  const allowed: JobType["status"][] = ["active", "accepted", "rejected"];
-  return (allowed as string[]).includes(s) ? (s as JobType["status"]) : "active";
-};
-
-const pickStringOrNull = (v: unknown) => {
-  if (typeof v !== "string") return null;
-  const s = v.trim();
-  return s.length ? s : null;
-};
-
-const normalizeTagsToArray = (tags: unknown): string[] => {
-  if (Array.isArray(tags)) {
-    return tags
-      .map((t) => (typeof t === "string" ? t.trim() : ""))
-      .filter(Boolean);
-  }
-  if (typeof tags === "string") {
-    return tags
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
-  }
-  return [];
-};
 
 const rowToJob = (row: JobRow): JobType => {
   return {
@@ -141,7 +110,7 @@ export const createJob = async (userId: string, payload: NewJobData): Promise<Jo
     status: "active",
     location: pickStringOrNull(payload.location),
     salary: pickStringOrNull(payload.salary),
-    tags: normalizeTagsToArray(payload.tags),
+    tags: normalizeTags(payload.tags),
     notes: pickStringOrNull(payload.notes),
     applied_date: new Date().toISOString(),
     rejected_from_stage: null,
@@ -170,7 +139,7 @@ export const updateJob = async (
   if (payload.position !== undefined) patch.position = payload.position.trim();
   if (payload.location !== undefined) patch.location = pickStringOrNull(payload.location);
   if (payload.salary !== undefined) patch.salary = pickStringOrNull(payload.salary);
-  if (payload.tags !== undefined) patch.tags = normalizeTagsToArray(payload.tags);
+  if (payload.tags !== undefined) patch.tags = normalizeTags(payload.tags);
   if (payload.notes !== undefined) patch.notes = pickStringOrNull(payload.notes);
 
   const { data, error } = await supabase

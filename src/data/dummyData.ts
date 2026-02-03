@@ -3,10 +3,10 @@ import type { JobType, StageId } from "../features/components/StageColumn";
 export const DUMMY_JOBS: JobType[] = [
     {
         id: '1',
-        company_name: 'Google',          // ← promenjeno iz companyName
+        company_name: 'Google',          
         position: 'Frontend Developer',
         stage: 'applied',
-        applied_date: '2024-01-15',      // ← promenjeno iz appliedDate
+        applied_date: '2024-01-15',     
         status: 'active' as const,
         salary: '$120,000',
         location: 'Remote',
