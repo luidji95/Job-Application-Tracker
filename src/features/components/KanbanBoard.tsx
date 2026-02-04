@@ -18,6 +18,7 @@ import {
 
 
 import { toast } from "sonner";
+import { ErrorBanner } from "../../components/ui/ErrorBanner";
 
 
 // Tip za podatke iz modala 
@@ -260,12 +261,17 @@ export const KanbanBoard = () => {
     return <div className="kanban-board">Loading jobs...</div>;
   }
 
-  if (error) {
-    return <div className="kanban-board">Failed to load jobs: {error}</div>;
-  }
+  // if (error) {
+  //   return <div className="kanban-board">Failed to load jobs: {error}</div>;
+  // }
 
   return (
     <>
+      {error && (
+        <ErrorBanner message={error} onClose={() => setError(null)}/>
+      )}
+
+
       <div className="kanban-board">
         {DEFAULT_STAGES.map((s) => (
           <StageColumn
