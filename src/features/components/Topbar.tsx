@@ -1,17 +1,17 @@
-
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabaseClient";
 import "./css/topbar.css";
 
-import { LogOut, Search } from "lucide-react";
-import { Button} from "../../components/ui/Button";
-import { Plus } from "lucide-react";
+import { LogOut, Search, Github, Plus } from "lucide-react";
+import { Button } from "../../components/ui/Button";
 
 type TopbarProps = {
   userName: string;
   avatarUrl?: string;
   onSeedClick?: () => void;
 };
+
+const GITHUB_REPO_URL = "https://github.com/luidji95/Job-Application-Tracker"; 
 
 export const Topbar = ({ userName, onSeedClick }: TopbarProps) => {
   const navigate = useNavigate();
@@ -29,50 +29,56 @@ export const Topbar = ({ userName, onSeedClick }: TopbarProps) => {
         </div>
 
         <div className="topbar-profile">
-        
+          {/* GORNJI RED */}
+          <div className="profile-row">
+            <div className="profile-info">
+              <div className="profile-avatar" />
+              <span className="profile-name">{userName}</span>
+            </div>
 
-          <div className="profile-info">
-            <div className="profile-avatar" />
-            <span className="profile-name">{userName}</span>
+            <div className="logout-btn">
+              <button onClick={handleLogout} aria-label="Logout">
+                <LogOut size={16} />
+              </button>
+            </div>
           </div>
 
-          <div className="logout-btn">
-            <button onClick={handleLogout}><LogOut size={16}></LogOut></button>
-          </div>
+          {/* DONJI RED */}
+          <a
+            href={GITHUB_REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="profile-oss"
+          >
+            <Github size={14} />
+            <span>Open source</span>
+          </a>
         </div>
       </div>
 
       <div className="topbar-toolbar">
         <div className="toolbar-search">
-          <Search className="search-icon"></Search>
-          <input type="text" placeholder="Search jobs"></input>
-          
+          <Search className="search-icon" />
+          <input type="text" placeholder="Search jobs" />
         </div>
 
-        
-         <div className="toolbar-actions">
-          <Button 
-           variant="primary" 
-           size="md"
-            className="toolbar-btn"
-          >
-            <Plus size={16} /> 
-            <span style={{ marginLeft: "8px" }}>New Application</span>
-           </Button>
-  
-          <Button 
-            variant="primary" 
+        <div className="toolbar-actions">
+          <Button variant="primary" size="md" className="toolbar-btn">
+            <Plus size={16} />
+            <span style={{ marginLeft: 8 }}>New Application</span>
+          </Button>
+
+          <Button
+            variant="primary"
             size="md"
             className="toolbar-btn"
             onClick={onSeedClick}
           >
-          <Plus size={16} />
-          <span style={{ marginLeft: "8px" }}>Seed</span>
+            <Plus size={16} />
+            <span style={{ marginLeft: 8 }}>Seed</span>
           </Button>
-        </div> 
+        </div>
       </div>
-
-      
     </header>
   );
 };
