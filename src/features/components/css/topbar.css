@@ -41,7 +41,10 @@
 }
 
 .profile-oss {
-  color: #aaa;
+  color: #fafafa;
+  display: flex;
+  gap:8px;
+  align-items: center;
 }
 .profile-oss:hover {
   color: #fff;

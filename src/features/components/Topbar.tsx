@@ -50,7 +50,7 @@ export const Topbar = ({ userName, onSeedClick }: TopbarProps) => {
             rel="noopener noreferrer"
             className="profile-oss"
           >
-            <Github size={14} />
+            <Github size={18} />
             <span>Open source</span>
           </a>
         </div>
