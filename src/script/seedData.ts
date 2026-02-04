@@ -1,15 +1,15 @@
 import { supabase } from "../lib/supabaseClient";
 import { DUMMY_JOBS } from "../data/dummyData";
-import type { JobType } from "../features/components/StageColumn";
+import type { JobType, StageId } from "../features/components/StageColumn";
 
 import { normalizeStage, normalizeStatus, normalizeTags, pickStringOrNull } from "../lib/jobs/jobUtils";
 
 // DB row shape - striktno za Supabase insert
 type JobRowInsert = {
   user_id: string;
-  stage: string;
+  stage: StageId;
   position: string;
-  status: string;
+  status: JobType['status'];
   location: string | null;
   salary: string | null;
   tags: string[]; 
@@ -48,8 +48,8 @@ export const seedDummyJobs = async (tableName: string = "jobs") => {
 
     const rows: JobRowInsert[] = DUMMY_JOBS.map((job: JobType) => {
         // NormalizeStatus i NormalizeStage vracaju StageId i StatusVariant type a meni treba string 
-      const status = normalizeStatus(job.status) as string; /* as string */
-      const stage = normalizeStage(job.stage) as string;  /* as string */
+      const status = normalizeStatus(job.status); /* as string */
+      const stage = normalizeStage(job.stage);  /* as string */
 
       const companyName = job.company_name?.trim() || "Unknown Company";
       const position = job.position?.trim() || "Unknown Position";

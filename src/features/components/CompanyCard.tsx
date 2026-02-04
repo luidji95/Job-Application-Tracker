@@ -10,11 +10,13 @@ type StageOption = {
 type CompanyCardProps = JobType & {
   onMove?: (jobId: string, toStage: StageId) => void;
   onRestore?: (jobId: string) => void;
-
   onEdit?: (jobId: string) => void;
   onDelete?: (jobId: string) => void;
 
   allStages: StageOption[];
+
+  disabled?: boolean;
+  busyLabel?: string | null;
 };
 
 const getCompanyColor = (name: string) => {
@@ -64,6 +66,8 @@ export const CompanyCard = ({
   onEdit,
   onDelete,
   allStages,
+  disabled = false,
+  busyLabel = null,
 }: CompanyCardProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [moveOpen, setMoveOpen] = useState(false);
@@ -86,6 +90,7 @@ export const CompanyCard = ({
   const stageOptions = allStages.filter((s) => s.id !== stage);
 
   const handleMove = (toStage: StageId) => {
+    if (disabled) return;
     onMove?.(id, toStage);
     setMenuOpen(false);
     setMoveOpen(false);
@@ -117,8 +122,10 @@ export const CompanyCard = ({
             type="button"
             aria-haspopup="menu"
             aria-expanded={menuOpen}
+            disabled={disabled}
             onClick={(e) => {
               e.stopPropagation();
+              if (disabled) return;
               setMenuOpen((p) => !p);
               setMoveOpen(false);
             }}
@@ -126,13 +133,15 @@ export const CompanyCard = ({
             ⋯
           </button>
 
-          {menuOpen && (
+          {/* menu renders ONLY if open AND not disabled */}
+          {menuOpen && !disabled && (
             <div className="card_menu" role="menu" onClick={(e) => e.stopPropagation()}>
               <button
                 type="button"
                 className="card_menu_item"
                 role="menuitem"
                 onClick={() => {
+                  if (disabled) return;
                   onEdit?.(id);
                   setMenuOpen(false);
                   setMoveOpen(false);
@@ -146,6 +155,7 @@ export const CompanyCard = ({
                 className="card_menu_item"
                 role="menuitem"
                 onClick={() => {
+                  if (disabled) return;
                   onDelete?.(id);
                   setMenuOpen(false);
                   setMoveOpen(false);
@@ -160,6 +170,7 @@ export const CompanyCard = ({
                   className="card_menu_item"
                   role="menuitem"
                   onClick={() => {
+                    if (disabled) return;
                     onRestore?.(id);
                     setMenuOpen(false);
                     setMoveOpen(false);
@@ -174,6 +185,7 @@ export const CompanyCard = ({
                   role="menuitem"
                   onClick={(e) => {
                     e.stopPropagation();
+                    if (disabled) return;
                     setMoveOpen((p) => !p);
                   }}
                 >
@@ -181,7 +193,8 @@ export const CompanyCard = ({
                 </button>
               )}
 
-              {moveOpen && stage !== "rejected" && (
+              {/* submenu also guarded by !disabled */}
+              {moveOpen && stage !== "rejected" && !disabled && (
                 <div className="card_submenu" role="menu">
                   {stageOptions.map((s) => (
                     <button
@@ -191,6 +204,7 @@ export const CompanyCard = ({
                       role="menuitem"
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (disabled) return;
                         handleMove(s.id);
                       }}
                     >
@@ -203,6 +217,9 @@ export const CompanyCard = ({
           )}
         </div>
       </div>
+
+      {/* BUSY LABEL */}
+      {busyLabel && <div className="company_card_busy">{busyLabel}</div>}
 
       {/* DETAILS */}
       <div className="company_card_details">

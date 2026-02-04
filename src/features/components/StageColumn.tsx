@@ -47,6 +47,9 @@ type StageColumnProps = {
   onDeleteJob?: (jobId: string) => void;
 
   allStages: StageOption[];
+
+  getJobAction?: (jobId: string) => "move" | "delete" | "restore" | "update" | null;
+  isAdding?: boolean;
 };
 
 export const StageColumn = ({
@@ -60,6 +63,8 @@ export const StageColumn = ({
   onEditJob,
   onDeleteJob,
   allStages,
+  getJobAction,
+  isAdding = false,
 }: StageColumnProps) => {
   const isApplied = id === "applied";
 
@@ -76,6 +81,7 @@ export const StageColumn = ({
             title={`Add job to ${title}`}
             aria-label={`Add job to ${title}`}
             type="button"
+            disabled={isAdding}
           >
             <Plus />
           </button>
@@ -86,17 +92,36 @@ export const StageColumn = ({
         {jobs.length === 0 ? (
           <p className="stage_column_empty">No jobs yet</p>
         ) : (
-          jobs.map((job) => (
-            <CompanyCard
-              key={job.id}
-              {...job}
-              onMove={onMoveJob}
-              onRestore={onRestoreJob}
-              onEdit={onEditJob}
-              onDelete={onDeleteJob}
-              allStages={allStages}
-            />
-          ))
+          jobs.map((job) => {
+            const action = getJobAction?.(job.id) ?? null;
+
+            const disabled = action !== null;
+
+            const busyLabel =
+              action === "delete"
+                ? "Deleting..."
+                : action === "move"
+                ? "Moving..."
+                : action === "restore"
+                ? "Restoring..."
+                : action === "update"
+                ? "Saving..."
+                : null;
+
+            return (
+              <CompanyCard
+                key={job.id}
+                {...job}
+                onMove={onMoveJob}
+                onRestore={onRestoreJob}
+                onEdit={onEditJob}
+                onDelete={onDeleteJob}
+                allStages={allStages}
+                disabled={disabled}
+                busyLabel={busyLabel}
+              />
+            );
+          })
         )}
       </div>
     </div>

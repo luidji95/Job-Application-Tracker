@@ -240,9 +240,9 @@
 }
 .card_submenu {
   position: absolute;
-  top: 100%; /* Ide ispod parent menija */
-  left: 0; /* Počinje od leve ivice parenta */
-  margin-top: 4px; /* Mali razmak */
+  top: 100%; 
+  left: 0; 
+  margin-top: 4px;
   min-width: 170px;
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -251,5 +251,19 @@
   padding: 6px;
   z-index: 31;
 }
+
+.company_card_busy {
+  margin: 8px 0;
+  font-size: 12px;
+  opacity: 0.8;
+  color: black;
+}
+
+.menu_btn:disabled,
+.card_menu_item:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 
 

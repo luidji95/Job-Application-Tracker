@@ -16,6 +16,10 @@ import {
   restoreJobDb,
 } from "../../lib/jobs/jobsApi";
 
+
+
+
+
 // Tip za podatke iz modala 
 type NewJobData = {
   company_name: string;
@@ -25,6 +29,12 @@ type NewJobData = {
   tags?: string;
   notes?: string;
 };
+
+type ActionType = "move" | "delete" | "restore" | "update";
+type ActionState =
+  | { type: "add" }
+  | { type: ActionType; jobId: string }
+  | null;
 
 export const KanbanBoard = () => {
   const [jobs, setJobs] = useState<JobType[]>([]);
@@ -37,6 +47,16 @@ export const KanbanBoard = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [action, setAction] = useState<ActionState>(null);
+
+  const getJobAction = (jobId: string) : ActionType | null => {
+    if(!action) return null;
+    if(action.type === 'add') return null;
+    return action.jobId === jobId ? action.type : null;
+  }
+
+  const isAdding = action?.type === "add";
 
   // Helper: refetch jobs (single source of truth)
   const refetch = useCallback(async (uid: string) => {
@@ -99,11 +119,17 @@ export const KanbanBoard = () => {
 
     try {
       setError(null);
+      setAction({type: 'move', jobId});
+
+
       await moveJobDb(userId, current, toStage);
       await refetch(userId);
+
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Failed to move job";
       setError(message);
+    } finally {
+      setAction(null);
     }
   };
 
@@ -116,11 +142,16 @@ export const KanbanBoard = () => {
 
     try {
       setError(null);
+      setAction({type: 'restore', jobId});
+
       await restoreJobDb(userId, current);
       await refetch(userId);
+
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Failed to restore job";
       setError(message);
+    } finally {
+      setAction(null);
     }
   };
 
@@ -130,6 +161,7 @@ export const KanbanBoard = () => {
 
     try {
       setError(null);
+      setAction({type: 'add'});
 
       
       await createJob(userId, {
@@ -146,6 +178,8 @@ export const KanbanBoard = () => {
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Failed to create job";
       setError(message);
+    } finally {
+      setAction(null);
     }
   };
 
@@ -158,11 +192,16 @@ export const KanbanBoard = () => {
 
     try {
       setError(null);
+      setAction({type: 'delete', jobId});
+
       await deleteJobDb(userId, jobId);
       await refetch(userId);
+
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Failed to delete job";
       setError(message);
+    } finally {
+      setAction(null);
     }
   };
 
@@ -181,6 +220,7 @@ export const KanbanBoard = () => {
 
     try {
       setError(null);
+      setAction({type: 'update', jobId: editingJob.id})
 
       await updateJob(userId, editingJob.id, {
         company: data.company_name,
@@ -198,6 +238,8 @@ export const KanbanBoard = () => {
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Failed to update job";
       setError(message);
+    } finally {
+      setAction(null);
     }
   };
 
@@ -226,6 +268,9 @@ export const KanbanBoard = () => {
             onEditJob={editJob}
             onDeleteJob={deleteJob}
             allStages={DEFAULT_STAGES}
+
+            getJobAction={getJobAction}
+            isAdding={isAdding}
           />
         ))}
       </div>
@@ -247,3 +292,22 @@ export const KanbanBoard = () => {
     </>
   );
 };
+
+
+
+/**
+ * 1️⃣ Mali UX polish (30 min)
+
+Disable dugmad dok traje async (isLoadingAction)
+
+Toast umesto alert
+
+Spinner samo u koloni koja se update-uje (nije must)
+
+2️⃣ Seed UX (optional, ali lepo)
+
+Umesto da seed “ćuti” kad ima poslove:
+
+pokaži poruku tipa
+“Seed disabled — you already have jobs. Delete all jobs to seed again.”
+ */
