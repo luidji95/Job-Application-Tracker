@@ -9,11 +9,12 @@ type TopbarProps = {
   userName: string;
   avatarUrl?: string;
   onSeedClick?: () => void;
+ 
 };
 
 const GITHUB_REPO_URL = "https://github.com/luidji95/Job-Application-Tracker"; 
 
-export const Topbar = ({ userName, onSeedClick }: TopbarProps) => {
+export const Topbar = ({ userName, onSeedClick}: TopbarProps) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -63,10 +64,10 @@ export const Topbar = ({ userName, onSeedClick }: TopbarProps) => {
         </div>
 
         <div className="toolbar-actions">
-          <Button variant="primary" size="md" className="toolbar-btn">
+          {/* <Button variant="primary" size="md" className="toolbar-btn">
             <Plus size={16} />
             <span style={{ marginLeft: 8 }}>New Application</span>
-          </Button>
+          </Button> */}
 
           <Button
             variant="primary"

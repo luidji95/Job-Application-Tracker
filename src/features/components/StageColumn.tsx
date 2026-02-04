@@ -1,6 +1,7 @@
 import "./css/stageColumn.css";
 import { Plus } from "lucide-react";
 import { CompanyCard } from "./CompanyCard";
+import { Button } from "../../components/ui/Button";
 
 type StatusVariant = "active" | "accepted" | "rejected";
 
@@ -75,17 +76,20 @@ export const StageColumn = ({
         <span className="jobs_column_count">{jobs.length}</span>
 
         {isApplied && onAddJob && (
-          <button
-            className="stage_column_add_btn"
-            onClick={() => onAddJob(id)}
-            title={`Add job to ${title}`}
-            aria-label={`Add job to ${title}`}
-            type="button"
+          <Button
+            variant="primary"
+            size="sm"
+            className="toolbar-btn"
+            isLoading={isAdding}
             disabled={isAdding}
+            type="button"
+            onClick={() => onAddJob(id)}
           >
-            <Plus />
-          </button>
+            <Plus size={16} />
+            <span>Add new</span>
+          </Button>
         )}
+
       </div>
 
       <div className="stage_column_body">
