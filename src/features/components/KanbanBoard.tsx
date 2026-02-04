@@ -17,7 +17,7 @@ import {
 } from "../../lib/jobs/jobsApi";
 
 
-
+import { toast } from "sonner";
 
 
 // Tip za podatke iz modala 
@@ -123,13 +123,18 @@ export const KanbanBoard = () => {
 
 
       await moveJobDb(userId, current, toStage);
+      toast.success('Application moved');
+
+
       await refetch(userId);
 
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : "Failed to move job";
+      const message = e instanceof Error ? e.message : "Failed to move application";
       setError(message);
+      toast.error(message);
     } finally {
       setAction(null);
+      
     }
   };
 
@@ -145,11 +150,14 @@ export const KanbanBoard = () => {
       setAction({type: 'restore', jobId});
 
       await restoreJobDb(userId, current);
+      toast.success('Applicaton successfully restored to stage where it was rejected from');
+
       await refetch(userId);
 
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : "Failed to restore job";
+      const message = e instanceof Error ? e.message : "Failed to restore application";
       setError(message);
+      toast.error(message);
     } finally {
       setAction(null);
     }
@@ -174,10 +182,12 @@ export const KanbanBoard = () => {
       });
 
       setModalOpen(false);
+      toast.success('Successfully added new application!');
       await refetch(userId);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Failed to create job";
       setError(message);
+      toast.error(message);
     } finally {
       setAction(null);
     }
@@ -233,11 +243,13 @@ export const KanbanBoard = () => {
 
       setEditModalOpen(false);
       setEditingJob(null);
+      toast.success('Successfully edited')
 
       await refetch(userId);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Failed to update job";
       setError(message);
+      toast.error(message);
     } finally {
       setAction(null);
     }
@@ -295,19 +307,4 @@ export const KanbanBoard = () => {
 
 
 
-/**
- * 1️⃣ Mali UX polish (30 min)
 
-Disable dugmad dok traje async (isLoadingAction)
-
-Toast umesto alert
-
-Spinner samo u koloni koja se update-uje (nije must)
-
-2️⃣ Seed UX (optional, ali lepo)
-
-Umesto da seed “ćuti” kad ima poslove:
-
-pokaži poruku tipa
-“Seed disabled — you already have jobs. Delete all jobs to seed again.”
- */

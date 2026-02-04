@@ -5,6 +5,7 @@ import { RegistrationPage } from "./pages/Auth/Registration/RegistrationPage";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import { AuthGuard } from "./routes/AuthGuard";
 
+
 export default function App() {
   return (
     <BrowserRouter>
