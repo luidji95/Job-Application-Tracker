@@ -278,9 +278,12 @@
 .company_card_expand_btn {
   background: transparent;
   border: 0;
+  border-bottom: 1px solid #070707 ;
+  border-bottom-left-radius: 10px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   opacity: 0.8;
+  color:#070707;
 }
 
 .company_card_expand_btn:disabled {
