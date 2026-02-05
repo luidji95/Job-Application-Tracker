@@ -71,6 +71,8 @@ export const CompanyCard = ({
 }: CompanyCardProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [moveOpen, setMoveOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   // close on outside click
@@ -87,6 +89,8 @@ export const CompanyCard = ({
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
+
+
   const stageOptions = allStages.filter((s) => s.id !== stage);
 
   const handleMove = (toStage: StageId) => {
@@ -96,9 +100,19 @@ export const CompanyCard = ({
     setMoveOpen(false);
   };
 
+  const toggleExpanded = () => {
+    if (disabled) return;
+    setExpanded((p) => !p);
+  };
+
   return (
-    <div className={`company_card company_card--${status}`} data-id={id}>
-      {/* HEADER */}
+    <div
+      className={`company_card company_card--${status} ${expanded ? "is-expanded" : ""} ${
+        disabled ? "is-busy" : ""
+      }`}
+      data-id={id}
+    >
+      {/* HEADER (COMPACT) */}
       <div className="company_card_header">
         <div className="company_card_info">
           <div
@@ -133,7 +147,6 @@ export const CompanyCard = ({
             ⋯
           </button>
 
-          {/* menu renders ONLY if open AND not disabled */}
           {menuOpen && !disabled && (
             <div className="card_menu" role="menu" onClick={(e) => e.stopPropagation()}>
               <button
@@ -141,7 +154,6 @@ export const CompanyCard = ({
                 className="card_menu_item"
                 role="menuitem"
                 onClick={() => {
-                  if (disabled) return;
                   onEdit?.(id);
                   setMenuOpen(false);
                   setMoveOpen(false);
@@ -155,7 +167,6 @@ export const CompanyCard = ({
                 className="card_menu_item"
                 role="menuitem"
                 onClick={() => {
-                  if (disabled) return;
                   onDelete?.(id);
                   setMenuOpen(false);
                   setMoveOpen(false);
@@ -170,7 +181,6 @@ export const CompanyCard = ({
                   className="card_menu_item"
                   role="menuitem"
                   onClick={() => {
-                    if (disabled) return;
                     onRestore?.(id);
                     setMenuOpen(false);
                     setMoveOpen(false);
@@ -185,7 +195,6 @@ export const CompanyCard = ({
                   role="menuitem"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (disabled) return;
                     setMoveOpen((p) => !p);
                   }}
                 >
@@ -193,8 +202,7 @@ export const CompanyCard = ({
                 </button>
               )}
 
-              {/* submenu also guarded by !disabled */}
-              {moveOpen && stage !== "rejected" && !disabled && (
+              {moveOpen && stage !== "rejected" && (
                 <div className="card_submenu" role="menu">
                   {stageOptions.map((s) => (
                     <button
@@ -204,7 +212,6 @@ export const CompanyCard = ({
                       role="menuitem"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (disabled) return;
                         handleMove(s.id);
                       }}
                     >
@@ -218,16 +225,31 @@ export const CompanyCard = ({
         </div>
       </div>
 
-      {/* BUSY LABEL */}
+      {/* COMPACT FOOTER ROW: status + expand */}
+      <div className="company_card_compact_footer">
+        <span className={`company_card_status company_card_status--${status}`}>
+          {status.charAt(0).toUpperCase() + status.slice(1)}
+        </span>
+
+        <button
+          type="button"
+          className="company_card_expand_btn"
+          onClick={toggleExpanded}
+          disabled={disabled}
+          aria-expanded={expanded}
+        >
+          {expanded ? "Hide" : "See more"}
+        </button>
+      </div>
+
+      {/* BUSY LABEL (small) */}
       {busyLabel && <div className="company_card_busy">{busyLabel}</div>}
 
-      {/* DETAILS */}
-      <div className="company_card_details">
+      {/* DETAILS (COLLAPSIBLE) */}
+      <div className={`company_card_details ${expanded ? "is-open" : ""}`}>
         <div className="details_item">
           <span className="detail_label">Applied:</span>
-          <span className="detail_value">
-            {new Date(applied_date).toLocaleDateString()}
-          </span>
+          <span className="detail_value">{new Date(applied_date).toLocaleDateString()}</span>
         </div>
 
         <div className="details_item">
@@ -258,12 +280,6 @@ export const CompanyCard = ({
             ))}
           </div>
         )}
-
-        <div className="company_card_footer">
-          <span className={`company_card_status company_card_status--${status}`}>
-            {status.charAt(0).toUpperCase() + status.slice(1)}
-          </span>
-        </div>
       </div>
     </div>
   );
