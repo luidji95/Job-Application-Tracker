@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./css/companyCard.css";
 import type { JobType, StageId } from "./StageColumn";
 
+
 type StageOption = {
   id: StageId;
   title: string;
@@ -12,6 +13,7 @@ type CompanyCardProps = JobType & {
   onRestore?: (jobId: string) => void;
   onEdit?: (jobId: string) => void;
   onDelete?: (jobId: string) => void;
+  onOpenNotes?: (jobId: string, anchorRect: DOMRect) => void;
 
   allStages: StageOption[];
 
@@ -65,6 +67,7 @@ export const CompanyCard = ({
   onRestore,
   onEdit,
   onDelete,
+  onOpenNotes,
   allStages,
   disabled = false,
   busyLabel = null,
@@ -280,6 +283,18 @@ export const CompanyCard = ({
             ))}
           </div>
         )}
+
+        <span
+           className="notes-trigger"
+           onClick={(e) => {
+            e.stopPropagation();
+            const rect = e.currentTarget.getBoundingClientRect();
+             onOpenNotes?.(id, rect);
+           }}
+          >
+          Notes
+        </span>
+
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { DEFAULT_STAGES } from "../../data/dummyData";
 import { StageColumn, type JobType, type StageId } from "./StageColumn";
 import { NewApplicationModal } from "./ModalComponents/NewApplicatonModal";
 import { EditApplicationModal } from "./ModalComponents/EditApplicationModal";
+import { NotesPopover } from "./NotesPopover";
 
 import { supabase } from "../../lib/supabaseClient";
 import {
@@ -37,6 +38,11 @@ type ActionState =
   | { type: ActionType; jobId: string }
   | null;
 
+type NotesStateProps = {
+  jobId: string;
+  anchorRect: DOMRect
+} | null
+
 export const KanbanBoard = () => {
   const [jobs, setJobs] = useState<JobType[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
@@ -50,6 +56,8 @@ export const KanbanBoard = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [action, setAction] = useState<ActionState>(null);
+
+  const [notesState, setNotesState] = useState<NotesStateProps>(null);
 
   const getJobAction = (jobId: string) : ActionType | null => {
     if(!action) return null;
@@ -256,6 +264,12 @@ export const KanbanBoard = () => {
     }
   };
 
+  const hanldeOpenNotes = (jobId: string, anchorRect: DOMRect) => {
+    setNotesState({jobId, anchorRect})
+  }
+  const selectedJob = notesState ? jobs.find(j => j.id === notesState.jobId) : null;
+
+
   // UI guard - loading/error
   if (isLoading) {
     return <div className="kanban-board">Loading jobs...</div>;
@@ -289,6 +303,8 @@ export const KanbanBoard = () => {
 
             getJobAction={getJobAction}
             isAdding={isAdding}
+
+            onOpenNotes={hanldeOpenNotes}
           />
         ))}
       </div>
@@ -307,6 +323,16 @@ export const KanbanBoard = () => {
           job={editingJob}
         />
       )}
+
+      {notesState && selectedJob && (
+        <NotesPopover
+          anchorRect={notesState.anchorRect}
+          companyName={selectedJob.company_name}
+          notes={selectedJob.notes ?? ""}
+          onClose={() => setNotesState(null)}
+        />
+      )}
+
     </>
   );
 };

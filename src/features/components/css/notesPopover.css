@@ -1,0 +1,38 @@
+.notes-popover {
+  width: 280px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 12px 14px;
+}
+
+.notes-popover::after {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 24px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  transform: rotate(45deg);
+}
+
+.notes-popover-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.notes-close-btn {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.notes-popover-content {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+}

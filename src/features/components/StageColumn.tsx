@@ -46,6 +46,8 @@ type StageColumnProps = {
   onRestoreJob?: (jobId: string) => void;
   onEditJob?: (jobId: string) => void;
   onDeleteJob?: (jobId: string) => void;
+  onOpenNotes?: (jobId: string, anchorRect: DOMRect) => void;
+
 
   allStages: StageOption[];
 
@@ -66,6 +68,7 @@ export const StageColumn = ({
   allStages,
   getJobAction,
   isAdding = false,
+  onOpenNotes,
 }: StageColumnProps) => {
   const isApplied = id === "applied";
 
@@ -120,6 +123,7 @@ export const StageColumn = ({
                 onRestore={onRestoreJob}
                 onEdit={onEditJob}
                 onDelete={onDeleteJob}
+                onOpenNotes={onOpenNotes}
                 allStages={allStages}
                 disabled={disabled}
                 busyLabel={busyLabel}

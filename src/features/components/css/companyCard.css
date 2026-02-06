@@ -310,7 +310,15 @@
   padding: 6px 12px;
   opacity: 0.85;
 }
+.notes-trigger{
+    color: black;
+  
+    border-bottom: 1px solid black;
+    border-bottom-right-radius: 10px;
+    font-size: 13px;
+    cursor: pointer;
 
+}
 
 
 
