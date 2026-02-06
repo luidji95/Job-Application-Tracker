@@ -36,7 +36,7 @@ export const EditApplicationModal = ({ onClose, onSubmit, job }: Props) => {
       location: job.location || "",
       salary: job.salary || "",
       tags: job.tags?.join(", ") || "",
-      notes: "", 
+      notes: job.notes || "", 
     },
   });
 
