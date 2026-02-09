@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./css/companyCard.css";
 import type { JobType, StageId } from "./StageColumn";
+import { Button } from "../../components/ui/Button";
 
 
 type StageOption = {
@@ -283,17 +284,24 @@ export const CompanyCard = ({
             ))}
           </div>
         )}
+        
 
-        <span
-           className="notes-trigger"
-           onClick={(e) => {
-            e.stopPropagation();
-            const rect = e.currentTarget.getBoundingClientRect();
-             onOpenNotes?.(id, rect);
-           }}
-          >
-          Notes
-        </span>
+        <div className="panel">
+             <Button
+                variant="secondary"
+                 onClick={(e) => {
+                     e.stopPropagation();
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    onOpenNotes?.(id, rect);
+                }}
+               >
+                Notes 
+              </Button>
+          
+          <Button variant="secondary">AI Insight </Button>
+        </div>
+
+     
 
       </div>
     </div>

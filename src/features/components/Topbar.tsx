@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabaseClient";
 import "./css/topbar.css";
 
-import { LogOut, Search, Github, Plus } from "lucide-react";
+import { LogOut, Search, Github,  } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 
 type TopbarProps = {
@@ -64,10 +64,10 @@ export const Topbar = ({ userName, onSeedClick}: TopbarProps) => {
         </div>
 
         <div className="toolbar-actions">
-          {/* <Button variant="primary" size="md" className="toolbar-btn">
-            <Plus size={16} />
-            <span style={{ marginLeft: 8 }}>New Application</span>
-          </Button> */}
+          <Button variant="danger" size="md" className="toolbar-btn">
+            
+            <span style={{ marginLeft: 8 }}>Delete all applications</span>
+          </Button>
 
           <Button
             variant="primary"
@@ -75,8 +75,8 @@ export const Topbar = ({ userName, onSeedClick}: TopbarProps) => {
             className="toolbar-btn"
             onClick={onSeedClick}
           >
-            <Plus size={16} />
-            <span style={{ marginLeft: 8 }}>Seed</span>
+            
+            <span style={{ marginLeft: 8 }}>Seed dummy</span>
           </Button>
         </div>
       </div>

@@ -311,13 +311,28 @@
   opacity: 0.85;
 }
 .notes-trigger{
-    color: black;
-  
-    border-bottom: 1px solid black;
-    border-bottom-right-radius: 10px;
-    font-size: 13px;
-    cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #070707 ;
+  border-bottom-right-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  opacity: 0.8;
+  color:#070707;
 
+}
+.panel{
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid rgb(0, 0, 0, 0.06);
+    margin-top: 15px;
+    padding-top: 15px;
+    
+    /* margin-top: 15px;
+    border-top: 1px solid rgb(0, 0, 0, 0.06);
+    padding: 10px; */
+    
+    
 }
 
 
