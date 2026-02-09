@@ -18,8 +18,8 @@ import {
 import { toast } from "sonner";
 import { ErrorBanner } from "../../components/ui/ErrorBanner";
 
-
 import { ApplicationModal } from "./ModalComponents/ApplicationModal";
+import { ConfirmModal } from "./ModalComponents/ConfirmModal";
 
 // Tip za podatke iz modala
 type NewJobData = {
@@ -27,12 +27,15 @@ type NewJobData = {
   position: string;
   location?: string;
   salary?: string;
-  tags?: string; 
+  tags?: string;
   notes?: string;
 };
 
-type ActionType = "move" | "delete" | "restore" | "update";
-type ActionState = | { type: "add" } | { type: ActionType; jobId: string } | null;
+type CardActionType = "move" | "delete" | "restore" | "update";
+type ActionState =
+  | { type: "add" }
+  | { type: CardActionType; jobId: string }
+  | null;
 
 type NotesStateProps =
   | {
@@ -41,10 +44,13 @@ type NotesStateProps =
     }
   | null;
 
+type ConfirmType =
+  | { type: "delete-one"; jobId: string }
+  | null;
+
 export const KanbanBoard = () => {
   const [jobs, setJobs] = useState<JobType[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
-
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
@@ -57,13 +63,16 @@ export const KanbanBoard = () => {
 
   const [notesState, setNotesState] = useState<NotesStateProps>(null);
 
-  const getJobAction = (jobId: string): ActionType | null => {
+  const [confirm, setConfirm] = useState<ConfirmType>(null);
+
+  const getJobAction = (jobId: string): CardActionType | null => {
     if (!action) return null;
     if (action.type === "add") return null;
     return action.jobId === jobId ? action.type : null;
   };
 
   const isAdding = action?.type === "add";
+  const isConfirmBusy = action?.type === "delete";
 
   // Helper: refetch jobs (single source of truth)
   const refetch = useCallback(async (uid: string) => {
@@ -182,14 +191,13 @@ export const KanbanBoard = () => {
         position: jobData.position,
         location: jobData.location,
         salary: jobData.salary,
-        tags: jobData.tags, // forma šalje string (comma separated) -> jobsApi može normalizovati
+        tags: jobData.tags,
         notes: jobData.notes,
       });
 
       toast.success("Successfully added new application!");
       await refetch(userId);
 
-      // zatvori modal + očisti edit state
       setModalOpen(false);
       setEditingJob(null);
     } catch (e: unknown) {
@@ -201,31 +209,12 @@ export const KanbanBoard = () => {
     }
   };
 
-  // DELETE (delete iz DB + refetch)
-  const deleteJob = async (jobId: string) => {
-    if (!userId) return;
-
-    const ok = window.confirm(
-      "Are you sure you want to delete this application?"
-    );
-    if (!ok) return;
-
-    try {
-      setError(null);
-      setAction({ type: "delete", jobId });
-
-      await deleteJobDb(userId, jobId);
-      await refetch(userId);
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : "Failed to delete job";
-      setError(message);
-      toast.error(message);
-    } finally {
-      setAction(null);
-    }
+  // DELETE ONE: samo otvori confirm modal
+  const requestDeleteJob = (jobId: string) => {
+    setConfirm({ type: "delete-one", jobId });
   };
 
-  // EDIT open (sad otvara isti modal)
+  // EDIT open (otvara isti modal)
   const editJob = (jobId: string) => {
     const jobToEdit = jobs.find((job) => job.id === jobId);
     if (!jobToEdit) return;
@@ -255,7 +244,6 @@ export const KanbanBoard = () => {
       toast.success("Successfully edited");
       await refetch(userId);
 
-      //  zatvori modal + očisti edit state
       setModalOpen(false);
       setEditingJob(null);
     } catch (e: unknown) {
@@ -267,6 +255,7 @@ export const KanbanBoard = () => {
     }
   };
 
+  // Notes
   const hanldeOpenNotes = (jobId: string, anchorRect: DOMRect) => {
     setNotesState({ jobId, anchorRect });
   };
@@ -274,6 +263,28 @@ export const KanbanBoard = () => {
   const selectedJob = notesState
     ? jobs.find((j) => j.id === notesState.jobId)
     : null;
+
+  // CONFIRM delete-one
+  const handleConfirmDelete = async () => {
+    if (!userId || !confirm) return;
+
+    try {
+      setError(null);
+      setAction({ type: "delete", jobId: confirm.jobId });
+
+      await deleteJobDb(userId, confirm.jobId);
+      toast.success("Application deleted");
+
+      await refetch(userId);
+      setConfirm(null);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Delete failed";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setAction(null);
+    }
+  };
 
   // UI guard - loading/error
   if (isLoading) {
@@ -300,7 +311,7 @@ export const KanbanBoard = () => {
             onMoveJob={moveJob}
             onRestoreJob={restoreJob}
             onEditJob={editJob}
-            onDeleteJob={deleteJob}
+            onDeleteJob={requestDeleteJob}
             allStages={DEFAULT_STAGES}
             getJobAction={getJobAction}
             isAdding={isAdding}
@@ -318,7 +329,6 @@ export const KanbanBoard = () => {
         />
       )}
 
-      {/*  ONE MODAL */}
       {modalOpen && (
         <ApplicationModal
           mode={modalMode}
@@ -328,6 +338,19 @@ export const KanbanBoard = () => {
             setEditingJob(null);
           }}
           onSubmit={modalMode === "create" ? addJob : handleUpdateSubmit}
+        />
+      )}
+
+      {confirm && (
+        <ConfirmModal
+          title="Delete this application?"
+          description="This will permanently delete this application. This cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+          danger
+          isLoading={isConfirmBusy}
+          onCancel={() => setConfirm(null)}
+          onConfirm={handleConfirmDelete}
         />
       )}
     </>

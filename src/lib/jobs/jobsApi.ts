@@ -245,3 +245,13 @@ export const countJobs = async (userId: string): Promise<number> => {
   if (error) throw error;
   return count ?? 0;
 };
+
+export const deleteAllJobsDb = async (userId: string) => {
+  const { error } = await supabase
+    .from("jobs")
+    .delete()
+    .eq("user_id", userId);
+
+  if (error) throw error;
+};
+

@@ -5,16 +5,18 @@ import "./css/topbar.css";
 import { LogOut, Search, Github,  } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 
+
 type TopbarProps = {
   userName: string;
   avatarUrl?: string;
   onSeedClick?: () => void;
+  onDeleteAll?: () => void;
  
 };
 
 const GITHUB_REPO_URL = "https://github.com/luidji95/Job-Application-Tracker"; 
 
-export const Topbar = ({ userName, onSeedClick}: TopbarProps) => {
+export const Topbar = ({ userName, onSeedClick, onDeleteAll}: TopbarProps) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -64,10 +66,16 @@ export const Topbar = ({ userName, onSeedClick}: TopbarProps) => {
         </div>
 
         <div className="toolbar-actions">
-          <Button variant="danger" size="md" className="toolbar-btn">
-            
-            <span style={{ marginLeft: 8 }}>Delete all applications</span>
-          </Button>
+        <Button
+          variant="danger"
+          size="md"
+          className="toolbar-btn"
+          onClick={onDeleteAll}
+          disabled={!onDeleteAll}
+        >
+          <span style={{ marginLeft: 8 }}>Delete all applications</span>
+        </Button>
+
 
           <Button
             variant="primary"
