@@ -4,6 +4,7 @@ import "./css/topbar.css";
 
 import { LogOut, Search, Github,  } from "lucide-react";
 import { Button } from "../../components/ui/Button";
+import { deleteAllJobsDb } from "../../lib/jobs/jobsApi";
 
 
 type TopbarProps = {
@@ -19,10 +20,32 @@ const GITHUB_REPO_URL = "https://github.com/luidji95/Job-Application-Tracker";
 export const Topbar = ({ userName, onSeedClick, onDeleteAll}: TopbarProps) => {
   const navigate = useNavigate();
 
+  // const handleLogout = async () => {
+  //   await supabase.auth.signOut();
+  //   navigate("/login", { replace: true });
+  // };
+
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/login", { replace: true });
-  };
+  const isDemo = localStorage.getItem("is_demo") === "1";
+
+  if (isDemo) {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
+    if (!error && user) {
+      await deleteAllJobsDb(user.id);
+    }
+
+    localStorage.removeItem("is_demo");
+  }
+
+  await supabase.auth.signOut();
+  navigate("/login", { replace: true });
+};
+
+
 
   return (
     <header className="topbar">

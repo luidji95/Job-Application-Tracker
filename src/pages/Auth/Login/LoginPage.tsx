@@ -37,9 +37,6 @@ const getPendingProfile = (): PendingProfile | null => {
   }
 };
 
-
-
-
 export const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -110,6 +107,30 @@ export const LoginPage = () => {
     }
   };
 
+  const handleTryDemo = async () => {
+  // 1) pozovi edge function
+  const { data, error } = await supabase.functions.invoke("create-guest");
+  if (error) {
+    // prikazi toast/modal
+    return;
+  }
+
+  const { email, password } = data as { email: string; password: string };
+
+  // 2) normalan login preko supabase auth
+  const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+  if (signInErr) {
+    // prikazi error
+    return;
+  }
+
+  // 3) opcionalno obeleži da je demo (da bi znao na logout šta radiš)
+  localStorage.setItem("is_demo", "1");
+
+  navigate("/dashboard");
+};
+
+
   return (
     <AuthLayout title="Login" subtitle="Enter your credentials to access your dashboard.">
       <form className="form" onSubmit={handleSubmit(onSubmit)}>
@@ -131,7 +152,7 @@ export const LoginPage = () => {
             Login
           </Button>
 
-          <Button variant="ghost" type="button" className="guest-demo-btn">
+          <Button variant="ghost" type="button" className="guest-demo-btn" onClick={handleTryDemo}>
             <span className="guest-icon">👁️</span>
             Try demo as guest
           </Button>
