@@ -41,6 +41,7 @@ export const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [demoLoading, setDemoLoading] = useState(false);
 
   const {
     register,
@@ -107,27 +108,34 @@ export const LoginPage = () => {
     }
   };
 
-  const handleTryDemo = async () => {
-  // 1) pozovi edge function
-  const { data, error } = await supabase.functions.invoke("create-guest");
-  if (error) {
-    // prikazi toast/modal
-    return;
+const handleTryDemo = async () => {
+  setError(null);
+  setDemoLoading(true);
+
+  try {
+    // 1) pozovi edge function
+    const { data, error } = await supabase.functions.invoke("create-guest");
+    if (error) throw error;
+
+    const { email, password } = data as { email: string; password: string };
+
+    // 2) normalan login
+    const { error: signInErr } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (signInErr) throw signInErr;
+
+    // 3) obeleži demo
+    localStorage.setItem("is_demo", "1");
+
+    navigate("/dashboard");
+  } catch (err: unknown) {
+    if (err instanceof Error) setError(err.message);
+    else setError("Demo login failed.");
+  } finally {
+    setDemoLoading(false);
   }
-
-  const { email, password } = data as { email: string; password: string };
-
-  // 2) normalan login preko supabase auth
-  const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
-  if (signInErr) {
-    // prikazi error
-    return;
-  }
-
-  // 3) opcionalno obeleži da je demo (da bi znao na logout šta radiš)
-  localStorage.setItem("is_demo", "1");
-
-  navigate("/dashboard");
 };
 
 
@@ -152,7 +160,7 @@ export const LoginPage = () => {
             Login
           </Button>
 
-          <Button variant="ghost" type="button" className="guest-demo-btn" onClick={handleTryDemo}>
+          <Button variant="ghost" type="button" className="guest-demo-btn" onClick={handleTryDemo} disabled={isLoading || demoLoading}>
             <span className="guest-icon">👁️</span>
             Try demo as guest
           </Button>
