@@ -389,7 +389,7 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 
 [functions.create-guest]
 enabled = true
-verify_jwt = true
+
 import_map = "./functions/create-guest/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -397,4 +397,5 @@ entrypoint = "./functions/create-guest/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/create-guest/*.html" ]
+
 
