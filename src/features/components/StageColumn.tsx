@@ -47,6 +47,8 @@ type StageColumnProps = {
   onEditJob?: (jobId: string) => void;
   onDeleteJob?: (jobId: string) => void;
   onOpenNotes?: (jobId: string, anchorRect: DOMRect) => void;
+  onOpenAi?: (jobId: string, anchorRect: DOMRect) => void;
+
 
 
   allStages: StageOption[];
@@ -72,6 +74,7 @@ export const StageColumn = ({
   getJobAction,
   isAdding = false,
   onOpenNotes,
+  onOpenAi,
   activeJobId,
 }: StageColumnProps) => {
   const isApplied = id === "applied";
@@ -128,6 +131,7 @@ export const StageColumn = ({
                 onEdit={onEditJob}
                 onDelete={onDeleteJob}
                 onOpenNotes={onOpenNotes}
+                onOpenAi={onOpenAi}
                 allStages={allStages}
                 disabled={disabled}
                 busyLabel={busyLabel}

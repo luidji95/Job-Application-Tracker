@@ -4,6 +4,7 @@ import "./css/kanbanBoard.css";
 import { DEFAULT_STAGES } from "../../data/dummyData";
 import { StageColumn, type JobType, type StageId } from "./StageColumn";
 import { NotesPopover } from "./NotesPopover";
+import { AiPopover } from "./AiPopover";
 
 import { supabase } from "../../lib/supabaseClient";
 import {
@@ -59,6 +60,13 @@ type KanbanBoardProps = {
   onJumpHandled: () => void;
 };
 
+type AiStateProps =
+  | {
+      jobId: string;
+      anchorRect: DOMRect;
+    }
+  | null;
+
 export const KanbanBoard = ({
   searchValue,
   activeJobId,
@@ -78,6 +86,8 @@ export const KanbanBoard = ({
   const [action, setAction] = useState<ActionState>(null);
   const [notesState, setNotesState] = useState<NotesStateProps>(null);
   const [confirm, setConfirm] = useState<ConfirmType>(null);
+
+  const [aiState, setAiState] = useState<AiStateProps>(null);
 
   const getJobAction = (jobId: string): CardActionType | null => {
     if (!action) return null;
@@ -156,7 +166,7 @@ export const KanbanBoard = ({
     });
   }, [jobs, searchValue]);
 
-  // ✅ Search results (for dropdown)
+  
   const searchResults = useMemo<SearchResult[]>(() => {
     const q = searchValue.trim();
     if (!q) return [];
@@ -174,7 +184,7 @@ export const KanbanBoard = ({
     onSearchResultsChange(searchResults);
   }, [searchResults, onSearchResultsChange]);
 
-  // ✅ Jump + highlight (scroll to card)
+  
   useEffect(() => {
     if (!activeJobId) return;
 
@@ -330,6 +340,10 @@ export const KanbanBoard = ({
 
   if (isLoading) return <div className="kanban-board">Loading jobs...</div>;
 
+  const handleOpenAi = (jobId: string, anchorRect: DOMRect) => {
+    setAiState({ jobId, anchorRect });
+  };
+
   return (
     <>
       {error && <ErrorBanner message={error} onClose={() => setError(null)} />}
@@ -355,6 +369,7 @@ export const KanbanBoard = ({
             getJobAction={getJobAction}
             isAdding={isAdding}
             onOpenNotes={hanldeOpenNotes}
+            onOpenAi={handleOpenAi}
             activeJobId={activeJobId}
           />
         ))}
@@ -368,6 +383,14 @@ export const KanbanBoard = ({
           onClose={() => setNotesState(null)}
         />
       )}
+
+      {aiState && (
+        <AiPopover
+         anchorRect={aiState.anchorRect}
+          onClose={() => setAiState(null)}
+        />
+      )}
+
 
       {modalOpen && (
         <ApplicationModal

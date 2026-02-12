@@ -15,6 +15,7 @@ type CompanyCardProps = JobType & {
   onEdit?: (jobId: string) => void;
   onDelete?: (jobId: string) => void;
   onOpenNotes?: (jobId: string, anchorRect: DOMRect) => void;
+  onOpenAi?: (jobId: string, anchorRect: DOMRect) => void;
 
   allStages: StageOption[];
 
@@ -22,6 +23,8 @@ type CompanyCardProps = JobType & {
   busyLabel?: string | null;
 
   isActive?: boolean;
+
+  
 };
 
 const getCompanyColor = (name: string) => {
@@ -71,6 +74,7 @@ export const CompanyCard = ({
   onEdit,
   onDelete,
   onOpenNotes,
+  onOpenAi,
   allStages,
   disabled = false,
   busyLabel = null,
@@ -302,7 +306,11 @@ export const CompanyCard = ({
                 Notes 
               </Button>
           
-          <Button variant="secondary">AI Insight (coming soon) </Button>
+          <Button variant="secondary" onClick={(e) => {
+            e.stopPropagation();
+            const rect = e.currentTarget.getBoundingClientRect();
+            onOpenAi?.(id, rect);
+          }}>AI Insight </Button>
         </div>
 
      

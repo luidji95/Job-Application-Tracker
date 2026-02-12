@@ -10,7 +10,7 @@ export const Sidebar = () => {
         <ul>
           
           <li className="sidebar-item"> Statistics (coming soon)</li>
-          <li className="sidebar-item">Settings</li>
+          <li className="sidebar-item">Settings (coming soon)</li>
           
           
           
