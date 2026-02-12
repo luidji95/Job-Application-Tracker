@@ -302,7 +302,7 @@ export const CompanyCard = ({
                 Notes 
               </Button>
           
-          <Button variant="secondary">AI Insight </Button>
+          <Button variant="secondary">AI Insight (coming soon) </Button>
         </div>
 
      

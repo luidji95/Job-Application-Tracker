@@ -9,8 +9,8 @@ export const Sidebar = () => {
       <nav className="sidebar-main">
         <ul>
           
-          <li className="sidebar-item"> Statistics soon</li>
-          
+          <li className="sidebar-item"> Statistics (coming soon)</li>
+          <li className="sidebar-item">Settings</li>
           
           
           
