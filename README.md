@@ -1,253 +1,116 @@
+# Job Application Tracker
+
+A personal job application tracker built with React + TypeScript and Supabase.  
+Includes authentication (email confirmation), profile upsert, and a Kanban-style dashboard for managing applications across stages.
+
+## Tech Stack
+
+- React + TypeScript (Vite)
+- React Router
+- Supabase (Auth + Postgres)
+- Zod (form validation)
+- Sonner (toast notifications)
 
+## Features
 
+### Authentication
 
+- Register with email + password (email confirmation enabled)
+- Login with Supabase Auth
+- Protected dashboard route
+- Profile upsert on first successful login (UPSERT into `profiles`)
 
-Job Application Tracker
+### Job Tracker (Dashboard)
 
-A personal job application tracker built with React + TypeScript and Supabase.
-Includes authentication (email confirmation), profile upsert, and a Kanban-style dashboard for managing applications across hiring stages.
+- Kanban board with stages:
+  - Applied
+  - HR
+  - Technical
+  - Final
+  - Offer
+  - Rejected
+- Create application (modal form)
+- Edit application
+- Move application between stages
+- Reject + restore logic (`rejected_from_stage`)
+- Delete application
+- Delete all applications
+- Per-card async action state (e.g. “Moving…”, “Deleting…”, “Saving…”)
+- Optional seed script (seed dummy jobs only if user has 0 jobs)
 
-This project evolved beyond a simple CRUD board — it includes global search, jump-to-card navigation, anchored popovers, and structured async state handling.
+### Search & Navigation
 
-Tech Stack
+- Global search input in Topbar
+- Live filtering across:
+  - Company name
+  - Position
+  - Location
+  - Tags
+- Dropdown search results (limited preview list)
+- Click-to-jump navigation
+- Smooth scroll to selected card
+- Temporary highlight animation for active card
 
-React + TypeScript (Vite)
+### Notes & AI Insight (UI ready)
 
-React Router
+- Anchored Notes popover (uses `getBoundingClientRect`)
+- AI Insight popover (currently placeholder)
+- Structured state flow ready for future AI integration
 
-Supabase (Auth + Postgres + RLS)
+## How the Auth Flow Works
 
-Zod (form validation)
+### Register
 
-Sonner (toasts)
+- Calls `supabase.auth.signUp(email, password)`
+- Supabase sends a confirmation email
+- No insert into `profiles` happens here (no authenticated session before confirmation)
 
-Lucide Icons
+### Confirm Email
 
-Features
-Authentication
+- User confirms signup via email link
 
-Register with email + password (email confirmation enabled)
+### Login
 
-Login with Supabase Auth
+- Calls `supabase.auth.signInWithPassword(email, password)`
+- On successful login the app runs:
+  - UPSERT into `profiles` using authenticated user id (`auth.users.id`)
+  - Redirects to `/dashboard`
 
-Protected dashboard route
+Why upsert on login?  
+With email confirmation enabled, the user isn't fully authenticated right after signup, so RLS would block inserts into `profiles`.  
+Upsert keeps the flow idempotent and safe to run on every login.
 
-Profile UPSERT on first successful login
+## Database Setup (Supabase)
 
-Proper RLS policies (users can only access their own data)
+### Table: `profiles`
 
-Job Tracker (Kanban Dashboard)
+- `id` (uuid, primary key, foreign key -> `auth.users.id`)
+- `email` (text)
+- `firstName` (text)
+- `lastName` (text)
+- `userName` (text)
 
-Kanban board with stages:
+### Table: `jobs`
 
-Applied
+- `id` (uuid, primary key)
+- `user_id` (uuid, foreign key -> `auth.users.id`)
+- `company_name` (text)
+- `position` (text)
+- `stage` (text)
+- `status` (text)
+- `location` (text, nullable)
+- `salary` (text, nullable)
+- `tags` (text[], nullable)
+- `notes` (text, nullable)
+- `applied_date` (timestamptz)
+- `rejected_from_stage` (text, nullable)
+- `created_at` (timestamptz default now())
 
-HR
+## Environment Variables
 
-Technical
+Create a `.env` file in the project root:
 
-Final
 
-Offer
 
-Rejected
-
-Create application (modal form)
-
-Edit application
-
-Move between stages
-
-Reject + restore logic (tracks rejected_from_stage)
-
-Delete single application
-
-Delete all applications
-
-Per-card async state (e.g. “Moving…”, “Deleting…”)
-
-Optional seed script (only seeds if user has 0 jobs)
-
-Global Search & Navigation
-
-Global search input in Topbar
-
-Live filtering across:
-
-Company name
-
-Position
-
-Location
-
-Tags
-
-Dropdown search results (limited preview list)
-
-Click-to-jump navigation
-
-Smooth scroll to selected card
-
-Temporary highlight animation for active card
-
-Search state is lifted to Dashboard and passed down to KanbanBoard, ensuring predictable one-way data flow.
-
-Notes & AI (UI Ready)
-
-Per-card Notes popover (anchored to button via getBoundingClientRect)
-
-AI Insight popover (UI placeholder — backend integration planned)
-
-Reusable anchor-based popover architecture
-
-Extensible structure for future AI feedback storage
-
-The AI module is designed to later:
-
-Accept pasted job description
-
-Extract must-have / nice-to-have technologies
-
-Provide application strategy suggestions
-
-Architecture Overview
-State Flow
-
-Dashboard holds:
-
-searchValue
-
-searchResults
-
-activeJobId
-
-KanbanBoard:
-
-Computes filtered jobs via useMemo
-
-Returns search results upward
-
-Handles jump + scroll logic
-
-CompanyCard:
-
-Handles UI state (expand, menu, popovers)
-
-Receives isActive for highlight animation
-
-This keeps the data flow predictable and avoids unnecessary re-renders.
-
-How the Auth Flow Works
-Register
-
-Calls supabase.auth.signUp(email, password)
-
-Supabase sends confirmation email
-
-No profile insert yet (no authenticated session)
-
-Confirm Email
-
-User confirms via email link
-
-Login
-
-Calls supabase.auth.signInWithPassword
-
-On success:
-
-UPSERT into profiles
-
-Redirect to /dashboard
-
-Why UPSERT on login?
-With email confirmation enabled, RLS would block profile insert during signup.
-Running UPSERT after authentication keeps the flow safe and idempotent.
-
-Database Setup (Supabase)
-Table: profiles
-
-id (uuid, PK, references auth.users.id)
-
-email (text)
-
-firstName (text)
-
-lastName (text)
-
-userName (text)
-
-Table: jobs
-
-id (uuid, PK)
-
-user_id (uuid, FK -> auth.users.id)
-
-company_name (text)
-
-position (text)
-
-stage (text)
-
-status (text)
-
-location (text, nullable)
-
-salary (text, nullable)
-
-tags (text[], nullable)
-
-notes (text, nullable)
-
-applied_date (timestamptz)
-
-rejected_from_stage (text, nullable)
-
-created_at (timestamptz default now())
-
-RLS Policies
-
-Enable Row Level Security and add:
-
-For profiles:
-
-SELECT: auth.uid() = id
-
-INSERT: auth.uid() = id
-
-UPDATE: auth.uid() = id
-
-DELETE: auth.uid() = id
-
-For jobs:
-
-SELECT: auth.uid() = user_id
-
-INSERT: auth.uid() = user_id
-
-UPDATE: auth.uid() = user_id
-
-DELETE: auth.uid() = user_id
-
-Environment Variables
-
-Create .env:
-
-VITE_SUPABASE_URL=...
-VITE_SUPABASE_ANON_KEY=...
-
-Run Locally
 npm install
 npm run dev
-
-Future Improvements
-
-AI Insight backend integration
-
-Statistics panel (applications per stage, rejection analytics)
-
-Date-based filtering
-
-Drag & drop stage movement
-
-Multi-user collaboration mode (long-term idea)
