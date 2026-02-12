@@ -1,3 +1,4 @@
+// Dashboard.tsx
 import { useEffect, useState } from "react";
 import "./dashboard.css";
 
@@ -22,6 +23,9 @@ const Dashboard = () => {
 
   const [deleteAllOpen, setDeleteAllOpen] = useState(false);
   const [isDeletingAll, setIsDeletingAll] = useState(false);
+
+  
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -94,9 +98,6 @@ const Dashboard = () => {
     }
   };
 
-
-
-
   return (
     <div className="dash">
       <aside className="dash__sidebar">
@@ -109,11 +110,15 @@ const Dashboard = () => {
             userName={profile?.userName ?? profile?.email ?? "User"}
             onSeedClick={handleSeedClick}
             onDeleteAll={handleDeleteAllClick}
+            
+            searchValue={searchValue}
+            setSearchValue={setSearchValue}
           />
         </div>
 
         <div className="dash__kanban">
-          <KanbanBoard key={refreshKey} />
+          
+          <KanbanBoard key={refreshKey} searchValue={searchValue} />
         </div>
       </div>
 

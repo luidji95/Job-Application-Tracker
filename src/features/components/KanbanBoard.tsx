@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
+// KanbanBoard.tsx
+import { useEffect, useState, useCallback, useMemo } from "react";
 import "./css/kanbanBoard.css";
 
 import { DEFAULT_STAGES } from "../../data/dummyData";
@@ -21,7 +22,6 @@ import { ErrorBanner } from "../../components/ui/ErrorBanner";
 import { ApplicationModal } from "./ModalComponents/ApplicationModal";
 import { ConfirmModal } from "./ModalComponents/ConfirmModal";
 
-// Tip za podatke iz modala
 type NewJobData = {
   company_name: string;
   position: string;
@@ -44,11 +44,13 @@ type NotesStateProps =
     }
   | null;
 
-type ConfirmType =
-  | { type: "delete-one"; jobId: string }
-  | null;
+type ConfirmType = { type: "delete-one"; jobId: string } | null;
 
-export const KanbanBoard = () => {
+type KanbanBoardProps = {
+  searchValue: string;
+};
+
+export const KanbanBoard = ({ searchValue }: KanbanBoardProps) => {
   const [jobs, setJobs] = useState<JobType[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -60,9 +62,7 @@ export const KanbanBoard = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [action, setAction] = useState<ActionState>(null);
-
   const [notesState, setNotesState] = useState<NotesStateProps>(null);
-
   const [confirm, setConfirm] = useState<ConfirmType>(null);
 
   const getJobAction = (jobId: string): CardActionType | null => {
@@ -74,13 +74,11 @@ export const KanbanBoard = () => {
   const isAdding = action?.type === "add";
   const isConfirmBusy = action?.type === "delete";
 
-  // Helper: refetch jobs (single source of truth)
   const refetch = useCallback(async (uid: string) => {
     const data = await fetchJobs(uid);
     setJobs(data ?? []);
   }, []);
 
-  // Ucitavamo userId iz session-a (auth)
   useEffect(() => {
     const loadUser = async () => {
       const {
@@ -106,7 +104,6 @@ export const KanbanBoard = () => {
     loadUser();
   }, []);
 
-  // Kad userId postoji povuci jobs iz baze
   useEffect(() => {
     if (!userId) return;
 
@@ -126,7 +123,26 @@ export const KanbanBoard = () => {
     loadJobs();
   }, [userId, refetch]);
 
-  // MOVE (persist u DB + refetch)
+  // FILTERED JOBS 
+  const filteredJobs = useMemo(() => {
+    const q = searchValue.trim().toLowerCase();
+    if (!q) return jobs;
+
+    return jobs.filter((j) => {
+      const company = (j.company_name ?? "").toLowerCase();
+      const position = (j.position ?? "").toLowerCase();
+      const location = (j.location ?? "").toLowerCase();
+      const tags = (j.tags ?? []).join(" ").toLowerCase();
+
+      return (
+        company.includes(q) ||
+        position.includes(q) ||
+        location.includes(q) ||
+        tags.includes(q)
+      );
+    });
+  }, [jobs, searchValue]);
+
   const moveJob = async (jobId: string, toStage: StageId) => {
     if (!userId) return;
 
@@ -151,7 +167,6 @@ export const KanbanBoard = () => {
     }
   };
 
-  // RESTORE (persist u DB + refetch)
   const restoreJob = async (jobId: string) => {
     if (!userId) return;
 
@@ -163,9 +178,7 @@ export const KanbanBoard = () => {
       setAction({ type: "restore", jobId });
 
       await restoreJobDb(userId, current);
-      toast.success(
-        "Applicaton successfully restored to stage where it was rejected from"
-      );
+      toast.success("Applicaton successfully restored to stage where it was rejected from");
 
       await refetch(userId);
     } catch (e: unknown) {
@@ -178,7 +191,6 @@ export const KanbanBoard = () => {
     }
   };
 
-  // ADD (insert u DB + refetch)
   const addJob = async (jobData: NewJobData) => {
     if (!userId) return;
 
@@ -209,12 +221,10 @@ export const KanbanBoard = () => {
     }
   };
 
-  // DELETE ONE: samo otvori confirm modal
   const requestDeleteJob = (jobId: string) => {
     setConfirm({ type: "delete-one", jobId });
   };
 
-  // EDIT open (otvara isti modal)
   const editJob = (jobId: string) => {
     const jobToEdit = jobs.find((job) => job.id === jobId);
     if (!jobToEdit) return;
@@ -224,7 +234,6 @@ export const KanbanBoard = () => {
     setModalOpen(true);
   };
 
-  // UPDATE (update u DB + refetch)
   const handleUpdateSubmit = async (data: NewJobData) => {
     if (!userId || !editingJob) return;
 
@@ -255,7 +264,6 @@ export const KanbanBoard = () => {
     }
   };
 
-  // Notes
   const hanldeOpenNotes = (jobId: string, anchorRect: DOMRect) => {
     setNotesState({ jobId, anchorRect });
   };
@@ -264,7 +272,6 @@ export const KanbanBoard = () => {
     ? jobs.find((j) => j.id === notesState.jobId)
     : null;
 
-  // CONFIRM delete-one
   const handleConfirmDelete = async () => {
     if (!userId || !confirm) return;
 
@@ -286,7 +293,6 @@ export const KanbanBoard = () => {
     }
   };
 
-  // UI guard - loading/error
   if (isLoading) {
     return <div className="kanban-board">Loading jobs...</div>;
   }
@@ -302,7 +308,8 @@ export const KanbanBoard = () => {
             id={s.id}
             title={s.title}
             color={s.color}
-            jobs={jobs.filter((job) => job.stage === s.id)}
+            // ✅ IMPORTANT: use filteredJobs, not jobs
+            jobs={filteredJobs.filter((job) => job.stage === s.id)}
             onAddJob={() => {
               setModalMode("create");
               setEditingJob(null);
