@@ -9,11 +9,11 @@ export const Sidebar = () => {
       <nav className="sidebar-main">
         <ul>
           
-          <li className="sidebar-item"> Statistics</li>
-          <li className="sidebar-item"> Contacts</li>
+          <li className="sidebar-item"> Statistics soon</li>
           
           
-          <li className="sidebar-item"> Community</li>
+          
+          
         </ul>
       </nav>
     </aside>
