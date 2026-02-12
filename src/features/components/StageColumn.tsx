@@ -53,6 +53,9 @@ type StageColumnProps = {
 
   getJobAction?: (jobId: string) => "move" | "delete" | "restore" | "update" | null;
   isAdding?: boolean;
+
+  activeJobId?: string | null;
+
 };
 
 export const StageColumn = ({
@@ -69,6 +72,7 @@ export const StageColumn = ({
   getJobAction,
   isAdding = false,
   onOpenNotes,
+  activeJobId,
 }: StageColumnProps) => {
   const isApplied = id === "applied";
 
@@ -127,6 +131,7 @@ export const StageColumn = ({
                 allStages={allStages}
                 disabled={disabled}
                 busyLabel={busyLabel}
+                isActive={activeJobId === job.id}
               />
             );
           })

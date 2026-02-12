@@ -20,6 +20,8 @@ type CompanyCardProps = JobType & {
 
   disabled?: boolean;
   busyLabel?: string | null;
+
+  isActive?: boolean;
 };
 
 const getCompanyColor = (name: string) => {
@@ -72,6 +74,7 @@ export const CompanyCard = ({
   allStages,
   disabled = false,
   busyLabel = null,
+  isActive = false,
 }: CompanyCardProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [moveOpen, setMoveOpen] = useState(false);
@@ -110,10 +113,11 @@ export const CompanyCard = ({
   };
 
   return (
-    <div
-      className={`company_card company_card--${status} ${expanded ? "is-expanded" : ""} ${
+    <div 
+      id={`job-${id}`}
+      className={`company_card {company_card--${status} ${expanded ? "is-expanded" : ""} ${
         disabled ? "is-busy" : ""
-      }`}
+      } ${isActive ? "is-active" : ""}`}
       data-id={id}
     >
       {/* HEADER (COMPACT) */}

@@ -1,4 +1,3 @@
-// Dashboard.tsx
 import { useEffect, useState } from "react";
 import "./dashboard.css";
 
@@ -17,6 +16,13 @@ type Profile = {
   email: string | null;
 };
 
+export type SearchResult = {
+  id: string;
+  company_name: string;
+  position: string;
+  stage: string;
+};
+
 const Dashboard = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -24,8 +30,9 @@ const Dashboard = () => {
   const [deleteAllOpen, setDeleteAllOpen] = useState(false);
   const [isDeletingAll, setIsDeletingAll] = useState(false);
 
-  
   const [searchValue, setSearchValue] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [activeJobId, setActiveJobId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -110,15 +117,21 @@ const Dashboard = () => {
             userName={profile?.userName ?? profile?.email ?? "User"}
             onSeedClick={handleSeedClick}
             onDeleteAll={handleDeleteAllClick}
-            
             searchValue={searchValue}
             setSearchValue={setSearchValue}
+            results={searchResults}
+            onPickResult={(id) => setActiveJobId(id)}
           />
         </div>
 
         <div className="dash__kanban">
-          
-          <KanbanBoard key={refreshKey} searchValue={searchValue} />
+          <KanbanBoard
+            key={refreshKey}
+            searchValue={searchValue}
+            activeJobId={activeJobId}
+            onSearchResultsChange={setSearchResults}
+            onJumpHandled={() => setActiveJobId(null)}
+          />
         </div>
       </div>
 
