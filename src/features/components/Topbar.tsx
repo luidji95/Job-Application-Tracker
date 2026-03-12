@@ -6,7 +6,7 @@ import { LogOut, Search, Github } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { deleteAllJobsDb } from "../../lib/jobs/jobsApi";
 import {  useState } from "react";
-import type { SearchResult } from "../../pages/Dashboard/Dashboard"; // prilagodi putanju ako je drugačije
+import type { SearchResult } from "../../pages/Dashboard/DashboardLayout"; 
 
 type TopbarProps = {
   userName: string;

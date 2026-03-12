@@ -1,10 +1,10 @@
-
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LoginPage } from "./pages/Auth/Login/LoginPage";
 import { RegistrationPage } from "./pages/Auth/Registration/RegistrationPage";
-import Dashboard from "./pages/Dashboard/Dashboard";
+import DashboardLayout from "./pages/Dashboard/DashboardLayout";
+import { KanbanBoard } from "./features/components/KanbanBoard";
+import { StatisticsPage } from "./pages/Dashboard/StatisticsPage";
 import { AuthGuard } from "./routes/AuthGuard";
-
 
 export default function App() {
   return (
@@ -13,16 +13,15 @@ export default function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
 
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegistrationPage></RegistrationPage>} />
-        
+        <Route path="/register" element={<RegistrationPage />} />
 
-        {/*PROTECTED*/}
-        <Route element={<AuthGuard/>}>
-          <Route path="/dashboard" element={<Dashboard/>} />
+        <Route element={<AuthGuard />}>
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route index element={<KanbanBoard />} />
+            <Route path="statistics" element={<StatisticsPage />} />
+          </Route>
         </Route>
-        
 
-        {/* fallback */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>

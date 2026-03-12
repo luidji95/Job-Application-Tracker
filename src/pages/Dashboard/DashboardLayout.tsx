@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
+import { Outlet } from "react-router-dom";
 import "./dashboard.css";
 
 import { Topbar } from "../../features/components/Topbar";
 import { Sidebar } from "../../features/components/Sidebar";
-import { KanbanBoard } from "../../features/components/KanbanBoard";
 import { supabase } from "../../lib/supabaseClient";
 
 import { seedDummyJobs } from "../../script/seedData";
 import { deleteAllJobsDb } from "../../lib/jobs/jobsApi";
 import { ConfirmModal } from "../../features/components/ModalComponents/ConfirmModal";
 import { toast } from "sonner";
+
+import { JobsProvider } from "../../features/components/context/JobsProvider";
+
 
 type Profile = {
   userName: string | null;
@@ -23,7 +26,15 @@ export type SearchResult = {
   stage: string;
 };
 
-const Dashboard = () => {
+export type DashboardOutletContext = {
+  searchValue: string;
+  activeJobId: string | null;
+  onSearchResultsChange: (results: SearchResult[]) => void;
+  onJumpHandled: () => void;
+  refreshKey: number;
+};
+
+const DashboardLayout = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -125,13 +136,18 @@ const Dashboard = () => {
         </div>
 
         <div className="dash__kanban">
-          <KanbanBoard
-            key={refreshKey}
-            searchValue={searchValue}
-            activeJobId={activeJobId}
-            onSearchResultsChange={setSearchResults}
-            onJumpHandled={() => setActiveJobId(null)}
+          <JobsProvider key={refreshKey}>
+              <Outlet
+                context={{
+                searchValue,
+                activeJobId,
+                onSearchResultsChange: setSearchResults,
+                onJumpHandled: () => setActiveJobId(null),
+                
+            }}
           />
+          </JobsProvider>
+          
         </div>
       </div>
 
@@ -147,11 +163,8 @@ const Dashboard = () => {
           onConfirm={confirmDeleteAll}
         />
       )}
-
-    
-
     </div>
   );
 };
 
-export default Dashboard;
+export default DashboardLayout;

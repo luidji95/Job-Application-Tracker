@@ -1,26 +1,19 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./css/kanbanBoard.css";
 
 import { DEFAULT_STAGES } from "../../data/dummyData";
 import { StageColumn, type JobType, type StageId } from "./StageColumn";
 import { NotesPopover } from "./NotesPopover";
 import { AiPopover } from "./AiPopover";
-
-import { supabase } from "../../lib/supabaseClient";
-import {
-  fetchJobs,
-  createJob,
-  updateJob,
-  deleteJobDb,
-  moveJobDb,
-  restoreJobDb,
-} from "../../lib/jobs/jobsApi";
+import { useJobs } from "./context/useJobs";
 
 import { toast } from "sonner";
 import { ErrorBanner } from "../../components/ui/ErrorBanner";
-
 import { ApplicationModal } from "./ModalComponents/ApplicationModal";
 import { ConfirmModal } from "./ModalComponents/ConfirmModal";
+
+import { useOutletContext } from "react-router-dom";
+import type { DashboardOutletContext } from "../../pages/Dashboard/DashboardLayout";
 
 type NewJobData = {
   company_name: string;
@@ -53,13 +46,6 @@ type SearchResult = {
   stage: string;
 };
 
-type KanbanBoardProps = {
-  searchValue: string;
-  activeJobId: string | null;
-  onSearchResultsChange: (r: SearchResult[]) => void;
-  onJumpHandled: () => void;
-};
-
 type AiStateProps =
   | {
       jobId: string;
@@ -67,27 +53,33 @@ type AiStateProps =
     }
   | null;
 
-export const KanbanBoard = ({
-  searchValue,
-  activeJobId,
-  onSearchResultsChange,
-  onJumpHandled,
-}: KanbanBoardProps) => {
-  const [jobs, setJobs] = useState<JobType[]>([]);
-  const [userId, setUserId] = useState<string | null>(null);
-
+export const KanbanBoard = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
   const [editingJob, setEditingJob] = useState<JobType | null>(null);
 
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [action, setAction] = useState<ActionState>(null);
   const [notesState, setNotesState] = useState<NotesStateProps>(null);
   const [confirm, setConfirm] = useState<ConfirmType>(null);
-
   const [aiState, setAiState] = useState<AiStateProps>(null);
+
+  const {
+    searchValue,
+    activeJobId,
+    onSearchResultsChange,
+    onJumpHandled,
+  } = useOutletContext<DashboardOutletContext>();
+
+  const {
+    jobs,
+    isLoading,
+    addJob,
+    editJob,
+    deleteJob,
+    moveJob,
+    restoreJob,
+  } = useJobs();
 
   const getJobAction = (jobId: string): CardActionType | null => {
     if (!action) return null;
@@ -97,55 +89,6 @@ export const KanbanBoard = ({
 
   const isAdding = action?.type === "add";
   const isConfirmBusy = action?.type === "delete";
-
-  const refetch = useCallback(async (uid: string) => {
-    const data = await fetchJobs(uid);
-    setJobs(data ?? []);
-  }, []);
-
-  useEffect(() => {
-    const loadUser = async () => {
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        setError(sessionError.message);
-        setIsLoading(false);
-        return;
-      }
-
-      if (!session?.user) {
-        setError("Not authenticated.");
-        setIsLoading(false);
-        return;
-      }
-
-      setUserId(session.user.id);
-    };
-
-    loadUser();
-  }, []);
-
-  useEffect(() => {
-    if (!userId) return;
-
-    const loadJobs = async () => {
-      try {
-        setError(null);
-        setIsLoading(true);
-        await refetch(userId);
-      } catch (e: unknown) {
-        const message = e instanceof Error ? e.message : "Unknown error";
-        setError(message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadJobs();
-  }, [userId, refetch]);
 
   const filteredJobs = useMemo(() => {
     const q = searchValue.trim().toLowerCase();
@@ -166,25 +109,22 @@ export const KanbanBoard = ({
     });
   }, [jobs, searchValue]);
 
-  
   const searchResults = useMemo<SearchResult[]>(() => {
     const q = searchValue.trim();
     if (!q) return [];
-    return filteredJobs
-      .slice(0, 8)
-      .map((j) => ({
-        id: j.id,
-        company_name: j.company_name,
-        position: j.position,
-        stage: j.stage,
-      }));
+
+    return filteredJobs.slice(0, 8).map((j) => ({
+      id: j.id,
+      company_name: j.company_name,
+      position: j.position,
+      stage: j.stage,
+    }));
   }, [filteredJobs, searchValue]);
 
   useEffect(() => {
     onSearchResultsChange(searchResults);
   }, [searchResults, onSearchResultsChange]);
 
-  
   useEffect(() => {
     if (!activeJobId) return;
 
@@ -200,20 +140,16 @@ export const KanbanBoard = ({
     return () => window.clearTimeout(t);
   }, [activeJobId, onJumpHandled]);
 
-  // MOVE / RESTORE / ADD / EDIT / DELETE logika ostaje ista...
-  const moveJob = async (jobId: string, toStage: StageId) => {
-    if (!userId) return;
-    const current = jobs.find((j) => j.id === jobId);
-    if (!current) return;
-
+  const handleMoveJob = async (jobId: string, toStage: StageId) => {
     try {
       setError(null);
       setAction({ type: "move", jobId });
-      await moveJobDb(userId, current, toStage);
+
+      await moveJob(jobId, toStage);
       toast.success("Application moved");
-      await refetch(userId);
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : "Failed to move application";
+      const message =
+        e instanceof Error ? e.message : "Failed to move application";
       setError(message);
       toast.error(message);
     } finally {
@@ -221,19 +157,18 @@ export const KanbanBoard = ({
     }
   };
 
-  const restoreJob = async (jobId: string) => {
-    if (!userId) return;
-    const current = jobs.find((j) => j.id === jobId);
-    if (!current) return;
-
+  const handleRestoreJob = async (jobId: string) => {
     try {
       setError(null);
       setAction({ type: "restore", jobId });
-      await restoreJobDb(userId, current);
-      toast.success("Applicaton successfully restored to stage where it was rejected from");
-      await refetch(userId);
+
+      await restoreJob(jobId);
+      toast.success(
+        "Application successfully restored to stage where it was rejected from"
+      );
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : "Failed to restore application";
+      const message =
+        e instanceof Error ? e.message : "Failed to restore application";
       setError(message);
       toast.error(message);
     } finally {
@@ -241,25 +176,14 @@ export const KanbanBoard = ({
     }
   };
 
-  const addJob = async (jobData: NewJobData) => {
-    if (!userId) return;
-
+  const handleAddJob = async (jobData: NewJobData) => {
     try {
       setError(null);
       setAction({ type: "add" });
 
-      await createJob(userId, {
-        company: jobData.company_name,
-        position: jobData.position,
-        location: jobData.location,
-        salary: jobData.salary,
-        tags: jobData.tags,
-        notes: jobData.notes,
-      });
+      await addJob(jobData);
 
       toast.success("Successfully added new application!");
-      await refetch(userId);
-
       setModalOpen(false);
       setEditingJob(null);
     } catch (e: unknown) {
@@ -271,35 +195,29 @@ export const KanbanBoard = ({
     }
   };
 
-  const requestDeleteJob = (jobId: string) => setConfirm({ type: "delete-one", jobId });
+  const requestDeleteJob = (jobId: string) => {
+    setConfirm({ type: "delete-one", jobId });
+  };
 
-  const editJob = (jobId: string) => {
+  const openEditJob = (jobId: string) => {
     const jobToEdit = jobs.find((job) => job.id === jobId);
     if (!jobToEdit) return;
+
     setModalMode("edit");
     setEditingJob(jobToEdit);
     setModalOpen(true);
   };
 
   const handleUpdateSubmit = async (data: NewJobData) => {
-    if (!userId || !editingJob) return;
+    if (!editingJob) return;
 
     try {
       setError(null);
       setAction({ type: "update", jobId: editingJob.id });
 
-      await updateJob(userId, editingJob.id, {
-        company: data.company_name,
-        position: data.position,
-        location: data.location,
-        salary: data.salary,
-        tags: data.tags,
-        notes: data.notes,
-      });
+      await editJob(editingJob.id, data);
 
       toast.success("Successfully edited");
-      await refetch(userId);
-
       setModalOpen(false);
       setEditingJob(null);
     } catch (e: unknown) {
@@ -311,23 +229,27 @@ export const KanbanBoard = ({
     }
   };
 
-  const hanldeOpenNotes = (jobId: string, anchorRect: DOMRect) => {
+  const handleOpenNotes = (jobId: string, anchorRect: DOMRect) => {
     setNotesState({ jobId, anchorRect });
   };
 
-  const selectedJob = notesState ? jobs.find((j) => j.id === notesState.jobId) : null;
+  const handleOpenAi = (jobId: string, anchorRect: DOMRect) => {
+    setAiState({ jobId, anchorRect });
+  };
+
+  const selectedJob = notesState
+    ? jobs.find((j) => j.id === notesState.jobId)
+    : null;
 
   const handleConfirmDelete = async () => {
-    if (!userId || !confirm) return;
+    if (!confirm) return;
 
     try {
       setError(null);
       setAction({ type: "delete", jobId: confirm.jobId });
 
-      await deleteJobDb(userId, confirm.jobId);
+      await deleteJob(confirm.jobId);
       toast.success("Application deleted");
-
-      await refetch(userId);
       setConfirm(null);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Delete failed";
@@ -338,11 +260,9 @@ export const KanbanBoard = ({
     }
   };
 
-  if (isLoading) return <div className="kanban-board">Loading jobs...</div>;
-
-  const handleOpenAi = (jobId: string, anchorRect: DOMRect) => {
-    setAiState({ jobId, anchorRect });
-  };
+  if (isLoading) {
+    return <div className="kanban-board">Loading jobs...</div>;
+  }
 
   return (
     <>
@@ -361,14 +281,14 @@ export const KanbanBoard = ({
               setEditingJob(null);
               setModalOpen(true);
             }}
-            onMoveJob={moveJob}
-            onRestoreJob={restoreJob}
-            onEditJob={editJob}
+            onMoveJob={handleMoveJob}
+            onRestoreJob={handleRestoreJob}
+            onEditJob={openEditJob}
             onDeleteJob={requestDeleteJob}
             allStages={DEFAULT_STAGES}
             getJobAction={getJobAction}
             isAdding={isAdding}
-            onOpenNotes={hanldeOpenNotes}
+            onOpenNotes={handleOpenNotes}
             onOpenAi={handleOpenAi}
             activeJobId={activeJobId}
           />
@@ -386,11 +306,10 @@ export const KanbanBoard = ({
 
       {aiState && (
         <AiPopover
-         anchorRect={aiState.anchorRect}
+          anchorRect={aiState.anchorRect}
           onClose={() => setAiState(null)}
         />
       )}
-
 
       {modalOpen && (
         <ApplicationModal
@@ -400,7 +319,7 @@ export const KanbanBoard = ({
             setModalOpen(false);
             setEditingJob(null);
           }}
-          onSubmit={modalMode === "create" ? addJob : handleUpdateSubmit}
+          onSubmit={modalMode === "create" ? handleAddJob : handleUpdateSubmit}
         />
       )}
 
