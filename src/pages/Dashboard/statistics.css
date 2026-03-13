@@ -1,6 +1,19 @@
 .statistics-page {
   padding: 24px;
-  color: #111827;
+  color: #fbfbfc;
+}
+
+.stats-back {
+  display: inline-block;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #6366f1;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.stats-back:hover {
+  text-decoration: underline;
 }
 
 .statistics-header {
@@ -11,45 +24,52 @@
   margin: 0 0 8px;
   font-size: 28px;
   font-weight: 700;
+  color: white;
 }
 
 .statistics-header p {
   margin: 0;
-  color: #6b7280;
+
   font-size: 14px;
 }
 
 .statistics-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
 
 .stat-card {
-  background: #ffffff;
+ 
   border: 1px solid #e5e7eb;
   border-radius: 14px;
   padding: 18px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+  color: white;
 }
 
 .stat-card h3 {
   margin: 0 0 12px;
   font-size: 14px;
-  color: #6b7280;
+
   font-weight: 600;
 }
 
 .stat-card p {
-  margin: 0;
+  margin: 0 0 8px;
   font-size: 28px;
   font-weight: 700;
-  color: #111827;
+ 
+}
+
+.stat-card small {
+
+  font-size: 12px;
 }
 
 .statistics-section {
-  background: #ffffff;
+ 
   border: 1px solid #e5e7eb;
   border-radius: 14px;
   padding: 20px;
@@ -57,8 +77,14 @@
 }
 
 .statistics-section h2 {
-  margin: 0 0 16px;
+  margin: 0 0 6px;
   font-size: 18px;
+}
+
+.section-subtitle {
+  margin: 0 0 16px;
+
+  font-size: 13px;
 }
 
 .stage-breakdown-list {
@@ -72,7 +98,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 14px;
-  background: #f9fafb;
+  background: #cce0d9;
   border-radius: 10px;
 }
 
