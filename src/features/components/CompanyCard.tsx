@@ -3,7 +3,6 @@ import "./css/companyCard.css";
 import type { JobType, StageId } from "./StageColumn";
 import { Button } from "../../components/ui/Button";
 
-
 type StageOption = {
   id: StageId;
   title: string;
@@ -15,16 +14,11 @@ type CompanyCardProps = JobType & {
   onEdit?: (jobId: string) => void;
   onDelete?: (jobId: string) => void;
   onOpenNotes?: (jobId: string, anchorRect: DOMRect) => void;
-  onOpenAi?: (jobId: string, anchorRect: DOMRect) => void;
-
+  onOpenAi?: (jobId: string) => void;
   allStages: StageOption[];
-
   disabled?: boolean;
   busyLabel?: string | null;
-
   isActive?: boolean;
-
-  
 };
 
 const getCompanyColor = (name: string) => {
@@ -86,7 +80,6 @@ export const CompanyCard = ({
 
   const menuRef = useRef<HTMLDivElement | null>(null);
 
-  // close on outside click
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
       if (!menuRef.current) return;
@@ -100,8 +93,6 @@ export const CompanyCard = ({
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
-
-
   const stageOptions = allStages.filter((s) => s.id !== stage);
 
   const handleMove = (toStage: StageId) => {
@@ -113,18 +104,17 @@ export const CompanyCard = ({
 
   const toggleExpanded = () => {
     if (disabled) return;
-    setExpanded((p) => !p);
+    setExpanded((prev) => !prev);
   };
 
   return (
-    <div 
+    <div
       id={`job-${id}`}
-      className={`company_card {company_card--${status} ${expanded ? "is-expanded" : ""} ${
+      className={`company_card company_card--${status} ${expanded ? "is-expanded" : ""} ${
         disabled ? "is-busy" : ""
       } ${isActive ? "is-active" : ""}`}
       data-id={id}
     >
-      {/* HEADER (COMPACT) */}
       <div className="company_card_header">
         <div className="company_card_info">
           <div
@@ -141,7 +131,6 @@ export const CompanyCard = ({
           </div>
         </div>
 
-        {/* MENU */}
         <div className="company_card_menu" ref={menuRef}>
           <button
             className="menu_btn"
@@ -152,7 +141,7 @@ export const CompanyCard = ({
             onClick={(e) => {
               e.stopPropagation();
               if (disabled) return;
-              setMenuOpen((p) => !p);
+              setMenuOpen((prev) => !prev);
               setMoveOpen(false);
             }}
           >
@@ -207,7 +196,7 @@ export const CompanyCard = ({
                   role="menuitem"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setMoveOpen((p) => !p);
+                    setMoveOpen((prev) => !prev);
                   }}
                 >
                   Move to <span className="submenu_arrow">›</span>
@@ -237,7 +226,6 @@ export const CompanyCard = ({
         </div>
       </div>
 
-      {/* COMPACT FOOTER ROW: status + expand */}
       <div className="company_card_compact_footer">
         <span className={`company_card_status company_card_status--${status}`}>
           {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -254,14 +242,14 @@ export const CompanyCard = ({
         </button>
       </div>
 
-      {/* BUSY LABEL (small) */}
       {busyLabel && <div className="company_card_busy">{busyLabel}</div>}
 
-      {/* DETAILS (COLLAPSIBLE) */}
       <div className={`company_card_details ${expanded ? "is-open" : ""}`}>
         <div className="details_item">
           <span className="detail_label">Applied:</span>
-          <span className="detail_value">{new Date(applied_date).toLocaleDateString()}</span>
+          <span className="detail_value">
+            {new Date(applied_date).toLocaleDateString()}
+          </span>
         </div>
 
         <div className="details_item">
@@ -292,29 +280,29 @@ export const CompanyCard = ({
             ))}
           </div>
         )}
-        
 
         <div className="panel">
-             <Button
-                variant="secondary"
-                 onClick={(e) => {
-                     e.stopPropagation();
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    onOpenNotes?.(id, rect);
-                }}
-               >
-                Notes 
-              </Button>
-          
-          <Button variant="secondary" onClick={(e) => {
-            e.stopPropagation();
-            const rect = e.currentTarget.getBoundingClientRect();
-            onOpenAi?.(id, rect);
-          }}>AI Insight </Button>
+          <Button
+            variant="secondary"
+            onClick={(e) => {
+              e.stopPropagation();
+              const rect = e.currentTarget.getBoundingClientRect();
+              onOpenNotes?.(id, rect);
+            }}
+          >
+            Notes
+          </Button>
+
+          <Button
+            variant="secondary"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenAi?.(id);
+            }}
+          >
+            AI Insight
+          </Button>
         </div>
-
-     
-
       </div>
     </div>
   );

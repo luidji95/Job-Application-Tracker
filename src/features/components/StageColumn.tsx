@@ -47,17 +47,12 @@ type StageColumnProps = {
   onEditJob?: (jobId: string) => void;
   onDeleteJob?: (jobId: string) => void;
   onOpenNotes?: (jobId: string, anchorRect: DOMRect) => void;
-  onOpenAi?: (jobId: string, anchorRect: DOMRect) => void;
-
-
+  onOpenAi?: (jobId: string) => void;
 
   allStages: StageOption[];
-
   getJobAction?: (jobId: string) => "move" | "delete" | "restore" | "update" | null;
   isAdding?: boolean;
-
   activeJobId?: string | null;
-
 };
 
 export const StageColumn = ({
@@ -99,7 +94,6 @@ export const StageColumn = ({
             <span>Add new</span>
           </Button>
         )}
-
       </div>
 
       <div className="stage_column_body">
@@ -108,7 +102,6 @@ export const StageColumn = ({
         ) : (
           jobs.map((job) => {
             const action = getJobAction?.(job.id) ?? null;
-
             const disabled = action !== null;
 
             const busyLabel =

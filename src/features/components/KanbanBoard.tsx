@@ -4,7 +4,7 @@ import "./css/kanbanBoard.css";
 import { DEFAULT_STAGES } from "../../data/dummyData";
 import { StageColumn, type JobType, type StageId } from "./StageColumn";
 import { NotesPopover } from "./NotesPopover";
-import { AiPopover } from "./AiPopover";
+import { AiInsightModal } from "./AiInsightModal";
 import { useJobs } from "./context/useJobs";
 
 import { toast } from "sonner";
@@ -49,7 +49,6 @@ type SearchResult = {
 type AiStateProps =
   | {
       jobId: string;
-      anchorRect: DOMRect;
     }
   | null;
 
@@ -233,12 +232,16 @@ export const KanbanBoard = () => {
     setNotesState({ jobId, anchorRect });
   };
 
-  const handleOpenAi = (jobId: string, anchorRect: DOMRect) => {
-    setAiState({ jobId, anchorRect });
+  const handleOpenAi = (jobId: string) => {
+    setAiState({ jobId });
   };
 
-  const selectedJob = notesState
+  const selectedNotesJob = notesState
     ? jobs.find((j) => j.id === notesState.jobId)
+    : null;
+
+  const selectedAiJob = aiState
+    ? jobs.find((j) => j.id === aiState.jobId)
     : null;
 
   const handleConfirmDelete = async () => {
@@ -295,18 +298,19 @@ export const KanbanBoard = () => {
         ))}
       </div>
 
-      {notesState && selectedJob && (
+      {notesState && selectedNotesJob && (
         <NotesPopover
           anchorRect={notesState.anchorRect}
-          companyName={selectedJob.company_name}
-          notes={selectedJob.notes ?? ""}
+          companyName={selectedNotesJob.company_name}
+          notes={selectedNotesJob.notes ?? ""}
           onClose={() => setNotesState(null)}
         />
       )}
 
-      {aiState && (
-        <AiPopover
-          anchorRect={aiState.anchorRect}
+      {aiState && selectedAiJob && (
+        <AiInsightModal
+          companyName={selectedAiJob.company_name}
+          position={selectedAiJob.position}
           onClose={() => setAiState(null)}
         />
       )}
