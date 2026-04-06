@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import "./css/kanbanBoard.css";
 
 import { DEFAULT_STAGES } from "../../data/dummyData";
+// import { StageColumn, type JobType, type StageId } from "./StageColumn";
 import { StageColumn, type JobType, type StageId } from "./StageColumn";
 import { NotesPopover } from "./NotesPopover";
 import { AiInsightModal } from "./AiInsightModal";

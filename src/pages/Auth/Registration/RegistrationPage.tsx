@@ -62,8 +62,6 @@ export const RegistrationPage = () => {
       );
 
 
-      
-
       // Ovde user mora da potvrdi preko mejla autetifikaciju
       setMessage("If an account with this email exists, you’ll receive a confirmation email shortly. Please check your inbox (and spam).");
 

@@ -16,7 +16,7 @@ export function AuthGuard() {
       if (!isMounted) return;
 
       if (error) {
-        // Ako hoćeš, možeš logovati error, ali nemoj crash
+       
         setSession(null);
       } else {
         setSession(data.session);

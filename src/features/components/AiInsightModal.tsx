@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "../components/css/aiPopover.css";
+import { supabase } from "../../lib/supabaseClient";
 
 type AiInsightResult = {
   focusAreas: string[];
@@ -39,47 +40,50 @@ export const AiInsightModal = ({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    const trimmed = jobDescription.trim();
+  const trimmed = jobDescription.trim();
 
-    if (!trimmed) {
-      setError("Please paste the job description first.");
-      return;
+  if (!trimmed) {
+    setError("Please paste the job description first.");
+    return;
+  }
+
+  setError(null);
+  setIsSubmitting(true);
+  setResult(null);
+
+  try {
+    const { data, error } = await supabase.functions.invoke("analyze-job", {
+      body: { jobDescription: trimmed },
+    });
+
+    console.log("EDGE DATA:", data);
+    console.log("EDGE ERROR:", error);
+
+    if (error) {
+      throw new Error(error.message || "Failed to call AI function.");
     }
 
-    setError(null);
-    setIsSubmitting(true);
-
-    try {
-      // TODO:
-      // ovde ces kasnije pozvati backend / supabase edge function
-      // koji komunicira sa OpenAI
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // privremeni mock rezultat
-      setResult({
-        focusAreas: [
-          "Highlight React and TypeScript experience",
-          "Show ownership of frontend architecture decisions",
-          "Emphasize API integration and async state handling",
-        ],
-        mustHaveSkills: ["React", "TypeScript", "REST APIs", "State Management"],
-        niceToHaveSkills: ["Testing", "Accessibility", "CI/CD"],
-        tips: [
-          "Tailor your CV summary to match the role wording",
-          "Move the most relevant project to the top of your experience section",
-          "Prepare 2-3 examples where you solved real UI/data flow problems",
-        ],
-      });
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "AI analysis failed.");
-    } finally {
-      setIsSubmitting(false);
+    if (!data?.content) {
+      throw new Error(data?.error || "AI did not return any content.");
     }
-  };
+
+    const parsed = JSON.parse(data.content);
+
+    setResult({
+      focusAreas: parsed.focusAreas ?? [],
+      mustHaveSkills: parsed.mustHaveSkills ?? [],
+      niceToHaveSkills: parsed.niceToHaveSkills ?? [],
+      tips: parsed.tips ?? [],
+    });
+  } catch (err: unknown) {
+    setError(err instanceof Error ? err.message : "AI analysis failed.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div
