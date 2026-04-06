@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import "../components/css/aiPopover.css";
 import { supabase } from "../../lib/supabaseClient";
+import { useJobs } from "./context/useJobs";
+import type { JobType } from "./StageColumn";
+import "../components/css/aiPopover.css";
 
 type AiInsightResult = {
   focusAreas: string[];
@@ -10,19 +12,50 @@ type AiInsightResult = {
 };
 
 type AiInsightModalProps = {
-  companyName?: string;
-  position?: string;
+  job: JobType;
   onClose: () => void;
 };
 
-export const AiInsightModal = ({
-  companyName,
-  position,
-  onClose,
-}: AiInsightModalProps) => {
+const parseAiJson = (raw: string) => {
+  const trimmed = raw.trim();
+
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    const firstBrace = trimmed.indexOf("{");
+    const lastBrace = trimmed.lastIndexOf("}");
+
+    if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {
+      throw new Error("AI returned invalid format. Try again.");
+    }
+
+    const jsonSlice = trimmed.slice(firstBrace, lastBrace + 1);
+
+    try {
+      return JSON.parse(jsonSlice);
+    } catch {
+      throw new Error("AI returned invalid JSON format. Try again.");
+    }
+  }
+};
+
+const normalizeStringArray = (value: unknown): string[] => {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter((item): item is string => typeof item === "string")
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
+
+export const AiInsightModal = ({ job, onClose }: AiInsightModalProps) => {
+  const { editJob } = useJobs();
+
   const [jobDescription, setJobDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [result, setResult] = useState<AiInsightResult | null>(null);
 
   useEffect(() => {
@@ -40,50 +73,105 @@ export const AiInsightModal = ({
     }
   };
 
- const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  const trimmed = jobDescription.trim();
+    const trimmed = jobDescription.trim();
 
-  if (!trimmed) {
-    setError("Please paste the job description first.");
-    return;
-  }
-
-  setError(null);
-  setIsSubmitting(true);
-  setResult(null);
-
-  try {
-    const { data, error } = await supabase.functions.invoke("analyze-job", {
-      body: { jobDescription: trimmed },
-    });
-
-    console.log("EDGE DATA:", data);
-    console.log("EDGE ERROR:", error);
-
-    if (error) {
-      throw new Error(error.message || "Failed to call AI function.");
+    if (!trimmed) {
+      setError("Please paste the job description first.");
+      return;
     }
 
-    if (!data?.content) {
-      throw new Error(data?.error || "AI did not return any content.");
+    setError(null);
+    setSaveMessage(null);
+    setIsSubmitting(true);
+    setResult(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("analyze-job", {
+        body: {
+          jobDescription: trimmed,
+          companyName: job.company_name,
+          position: job.position,
+        },
+      });
+
+      if (error) {
+        const errorMessage =
+          typeof error === "object" &&
+          error !== null &&
+          "context" in error &&
+          error.context instanceof Response
+            ? await error.context.text()
+            : error.message || "Failed to call AI function.";
+
+        throw new Error(errorMessage);
+      }
+
+      if (!data?.content) {
+        throw new Error(data?.error || "AI did not return any content.");
+      }
+
+      const parsed = parseAiJson(data.content);
+
+      setResult({
+        focusAreas: normalizeStringArray(parsed.focusAreas),
+        mustHaveSkills: normalizeStringArray(parsed.mustHaveSkills),
+        niceToHaveSkills: normalizeStringArray(parsed.niceToHaveSkills),
+        tips: normalizeStringArray(parsed.tips),
+      });
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "AI analysis failed.");
+    } finally {
+      setIsSubmitting(false);
     }
+  };
 
-    const parsed = JSON.parse(data.content);
+  const handleSave = async () => {
+    if (!result) return;
 
-    setResult({
-      focusAreas: parsed.focusAreas ?? [],
-      mustHaveSkills: parsed.mustHaveSkills ?? [],
-      niceToHaveSkills: parsed.niceToHaveSkills ?? [],
-      tips: parsed.tips ?? [],
-    });
-  } catch (err: unknown) {
-    setError(err instanceof Error ? err.message : "AI analysis failed.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+    setError(null);
+    setSaveMessage(null);
+    setIsSaving(true);
+
+    const aiNotesBlock = `
+AI INSIGHT
+
+What to focus on:
+${result.focusAreas.map((item) => `- ${item}`).join("\n")}
+
+Must-have skills:
+${result.mustHaveSkills.map((item) => `- ${item}`).join("\n")}
+
+Nice-to-have skills:
+${result.niceToHaveSkills.map((item) => `- ${item}`).join("\n")}
+
+Tips:
+${result.tips.map((item) => `- ${item}`).join("\n")}
+    `.trim();
+
+    const mergedNotes = job.notes?.trim()
+      ? `${job.notes.trim()}\n\n--------------------\n\n${aiNotesBlock}`
+      : aiNotesBlock;
+
+    try {
+      await editJob(job.id, {
+        company_name: job.company_name,
+        position: job.position,
+        location: job.location ?? "",
+        salary: job.salary ?? "",
+        tags: (job.tags ?? []).join(", "),
+        notes: mergedNotes,
+      });
+
+      setSaveMessage("AI insight saved to notes.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to save AI insight.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div
@@ -98,9 +186,7 @@ export const AiInsightModal = ({
           <div>
             <h2 id="ai-modal-title">AI Insight</h2>
             <p className="ai-modal-subtitle">
-              {companyName || position
-                ? `Analyze job description for ${companyName ?? "this company"}${position ? ` — ${position}` : ""}`
-                : "Paste a job description and get actionable insights."}
+              Analyze job description for {job.company_name} — {job.position}
             </p>
           </div>
 
@@ -108,7 +194,7 @@ export const AiInsightModal = ({
             type="button"
             className="ai-modal-close"
             onClick={onClose}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isSaving}
             aria-label="Close AI insight modal"
           >
             ✕
@@ -127,7 +213,7 @@ export const AiInsightModal = ({
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
             rows={10}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isSaving}
           />
 
           <p className="ai-modal-hint">
@@ -135,13 +221,14 @@ export const AiInsightModal = ({
           </p>
 
           {error && <div className="ai-modal-error">{error}</div>}
+          {saveMessage && <div className="ai-modal-success">{saveMessage}</div>}
 
           <div className="ai-modal-actions">
             <button
               type="button"
               className="ai-btn ai-btn-secondary"
               onClick={onClose}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isSaving}
             >
               Cancel
             </button>
@@ -149,7 +236,7 @@ export const AiInsightModal = ({
             <button
               type="submit"
               className="ai-btn ai-btn-primary"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isSaving}
             >
               {isSubmitting ? "Analyzing..." : "Analyze with AI"}
             </button>
@@ -196,6 +283,17 @@ export const AiInsightModal = ({
                   <li key={tip}>{tip}</li>
                 ))}
               </ul>
+            </div>
+
+            <div className="ai-modal-actions">
+              <button
+                type="button"
+                className="ai-btn ai-btn-secondary"
+                onClick={handleSave}
+                disabled={isSaving || isSubmitting}
+              >
+                {isSaving ? "Saving..." : "Save to notes"}
+              </button>
             </div>
           </div>
         )}

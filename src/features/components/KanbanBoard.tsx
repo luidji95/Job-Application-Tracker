@@ -310,8 +310,7 @@ export const KanbanBoard = () => {
 
       {aiState && selectedAiJob && (
         <AiInsightModal
-          companyName={selectedAiJob.company_name}
-          position={selectedAiJob.position}
+          job={selectedAiJob}
           onClose={() => setAiState(null)}
         />
       )}
