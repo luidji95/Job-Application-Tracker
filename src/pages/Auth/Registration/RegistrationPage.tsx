@@ -47,39 +47,39 @@ export const RegistrationPage = () => {
     try {
       const { error: signUpError } = await supabase.auth.signUp({
         email: data.email,
-        password: data.password, 
+        password: data.password,
+        options: {
+          data: {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            userName: data.username,
+          },
+        },
       });
 
       if (signUpError) throw signUpError;
 
-      localStorage.setItem(
-        "pending_profile",
-        JSON.stringify({
-          firstName: data.firstName,
-          lastName: data.lastName,
-          username: data.username,
-        })
+      setMessage(
+        "If an account with this email exists, you’ll receive a confirmation email shortly. Please check your inbox and spam."
       );
-
-
-      // Ovde user mora da potvrdi preko mejla autetifikaciju
-      setMessage("If an account with this email exists, you’ll receive a confirmation email shortly. Please check your inbox (and spam).");
 
       reset();
     } catch (err: unknown) {
-      if(err instanceof Error){
-        setError(err?.message ?? "Registration failed.");
+      if (err instanceof Error) {
+        setError(err.message ?? "Registration failed.");
       } else {
-        setError("Registration failed");
+        setError("Registration failed.");
       }
-      
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <AuthLayout title="Create account" subtitle="Create your account to access your dashboard.">
+    <AuthLayout
+      title="Create account"
+      subtitle="Create your account to access your dashboard."
+    >
       <form className="form" onSubmit={handleSubmit(onSubmit)}>
         <div className="form-row">
           <Input
@@ -134,9 +134,11 @@ export const RegistrationPage = () => {
         <label className="checkbox">
           <input type="checkbox" {...register("terms")} />
           <span>
-            I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+            I agree to the <a href="#">Terms</a> and{" "}
+            <a href="#">Privacy Policy</a>
           </span>
         </label>
+
         {errors.terms && <p className="error">{errors.terms.message}</p>}
 
         <div className="form-actions">

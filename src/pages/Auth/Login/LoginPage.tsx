@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { z } from "zod";
 
 import { Input } from "../../../components/ui/Input";
 import { PasswordInput } from "../../../components/ui/PasswordInput";
@@ -10,38 +11,17 @@ import { AuthLayout } from "../../../layouts/AuthLayout/AuthLayout";
 import { supabase } from "../../../lib/supabaseClient";
 
 import { loginSchema } from "../../../schemas/auth.schema";
-import type { z } from "zod";
 
 import "./loginPage.css";
 
-
-
-
-
 type LoginFormData = z.infer<typeof loginSchema>;
-
-type PendingProfile = {
-  firstName?: string;
-  lastName?: string;
-  username?: string;
-};
-
-const getPendingProfile = (): PendingProfile | null => {
-  const raw = localStorage.getItem("pending_profile");
-  if (!raw) return null;
-
-  try {
-    return JSON.parse(raw) as PendingProfile;
-  } catch {
-    return null;
-  }
-};
 
 export const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
   const [demoLoading, setDemoLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const {
     register,
@@ -56,9 +36,6 @@ export const LoginPage = () => {
     },
     mode: "onSubmit",
   });
-
-
-
 
   const onSubmit = async (data: LoginFormData) => {
     setError(null);
@@ -76,71 +53,59 @@ export const LoginPage = () => {
       const user = authData.user;
       if (!user) throw new Error("No user returned.");
 
-      // Upsert - Azuriranje profila
-      
-      await supabase.from("profiles").upsert({ id: user.id, email: user.email }, { onConflict: "id" });
-
-        const pending = getPendingProfile();
-        if (pending) {
-            await supabase.from("profiles").update({
-            firstName: pending.firstName,
-            lastName: pending.lastName,
-            userName: pending.username,
-             }).eq("id", user.id);
-
-            localStorage.removeItem("pending_profile");
-        }
-
-
-      
-
       reset();
       navigate("/dashboard");
     } catch (err: unknown) {
-        if(err instanceof Error) {
-            setError(err?.message ?? "Login failed.");
-        } else {
-            setError("Login failed");
-        }
-      
+      if (err instanceof Error) {
+        setError(err.message ?? "Login failed.");
+      } else {
+        setError("Login failed.");
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-const handleTryDemo = async () => {
-  setError(null);
-  setDemoLoading(true);
+  const handleTryDemo = async () => {
+    setError(null);
+    setDemoLoading(true);
 
-  try {
-    // 1) pozovi edge function
-    const { data, error } = await supabase.functions.invoke("create-guest");
-    if (error) throw error;
+    try {
+      const { data, error } = await supabase.functions.invoke("create-guest");
 
-    const { email, password } = data as { email: string; password: string };
+      if (error) throw error;
 
-    // 2) normalan login
-    const { error: signInErr } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (signInErr) throw signInErr;
+      const { email, password } = data as {
+        email: string;
+        password: string;
+      };
 
-    // 3) obeleži demo
-    localStorage.setItem("is_demo", "1");
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    navigate("/dashboard");
-  } catch (err: unknown) {
-    if (err instanceof Error) setError(err.message);
-    else setError("Demo login failed.");
-  } finally {
-    setDemoLoading(false);
-  }
-};
+      if (signInErr) throw signInErr;
 
+      localStorage.setItem("is_demo", "1");
+
+      navigate("/dashboard");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Demo login failed.");
+      }
+    } finally {
+      setDemoLoading(false);
+    }
+  };
 
   return (
-    <AuthLayout title="Login" subtitle="Enter your credentials to access your dashboard.">
+    <AuthLayout
+      title="Login"
+      subtitle="Enter your credentials to access your dashboard."
+    >
       <form className="form" onSubmit={handleSubmit(onSubmit)}>
         <Input
           label="Email"
@@ -160,14 +125,27 @@ const handleTryDemo = async () => {
             Login
           </Button>
 
-          <Button variant="ghost" type="button" className="guest-demo-btn" onClick={handleTryDemo} disabled={isLoading || demoLoading}>
+          <Button
+            variant="ghost"
+            type="button"
+            className="guest-demo-btn"
+            onClick={handleTryDemo}
+            disabled={isLoading || demoLoading}
+          >
             <span className="guest-icon">👁️</span>
             Try demo as guest
           </Button>
         </div>
 
         {error && (
-          <p style={{ color: "red", marginTop: "10px", border: "1px solid red", padding: 8 }}>
+          <p
+            style={{
+              color: "red",
+              marginTop: "10px",
+              border: "1px solid red",
+              padding: 8,
+            }}
+          >
             {error}
           </p>
         )}
