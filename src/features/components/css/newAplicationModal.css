@@ -118,7 +118,26 @@
   .form-grid {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* phones: the window sits at the bottom like a sheet and the buttons fill the width */
+@media (max-width: 560px) {
+  .modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
   .modal-card {
-    padding: 20px 16px;
+    width: 100%;
+    max-width: none;
+    max-height: 92vh;
+    max-height: 92dvh;
+    padding: 20px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    border-radius: 18px 18px 0 0;
+  }
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+  .modal-actions .btn {
+    width: 100%;
   }
 }

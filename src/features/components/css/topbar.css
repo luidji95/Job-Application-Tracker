@@ -120,8 +120,33 @@
   color: var(--ink);
 }
 
-@media (max-width: 560px) {
+/* tablets: actions keep their icons, labels go */
+@media (max-width: 720px) {
+  .topbar {
+    flex-wrap: nowrap;
+    padding: 10px 16px;
+    gap: 8px;
+  }
+  .toolbar-search {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+  }
+  .toolbar-actions {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  .toolbar-btn {
+    width: 44px;
+    padding: 0;
+  }
   .toolbar-btn span {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .profile-oss {
     display: none;
   }
 }

@@ -252,3 +252,20 @@
   padding-left: 6px;
   border-left: 2px solid var(--line);
 }
+
+/* wider cards and fingers instead of a mouse: bigger buttons */
+@media (max-width: 860px), (pointer: coarse) {
+  .company_card {
+    padding: 12px;
+  }
+  .card_icon_btn {
+    width: 40px;
+    height: 40px;
+  }
+  .card_menu_item {
+    min-height: 44px;
+  }
+  .company_card_rejected button {
+    min-height: 40px;
+  }
+}

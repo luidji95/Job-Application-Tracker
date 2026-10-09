@@ -80,7 +80,13 @@ export const Topbar = ({
       </div>
 
       <div className="toolbar-actions">
-        <Button variant="ghost" size="md" className="toolbar-btn" onClick={onSeedClick}>
+        <Button
+          variant="ghost"
+          size="md"
+          className="toolbar-btn"
+          onClick={onSeedClick}
+          aria-label="Load sample data"
+        >
           <DatabaseZap size={16} aria-hidden="true" />
           <span>Load sample data</span>
         </Button>
@@ -91,6 +97,7 @@ export const Topbar = ({
           className="toolbar-btn"
           onClick={onDeleteAll}
           disabled={!onDeleteAll}
+          aria-label="Delete all applications"
         >
           <Trash2 size={16} aria-hidden="true" />
           <span>Delete all</span>

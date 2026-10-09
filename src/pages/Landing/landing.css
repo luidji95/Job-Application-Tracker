@@ -398,19 +398,83 @@
   color: var(--muted);
 }
 
+/* large screens: a little more air, same reading width */
+@media (min-width: 1500px) {
+  .landing__inner {
+    max-width: 1240px;
+    gap: 112px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .hero {
+    gap: 36px;
+  }
+  .features {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .features .feature:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 860px) {
   .landing__inner {
     gap: 64px;
   }
-  .features,
   .steps {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
-@media (max-width: 560px) {
+/* phones: the nav keeps only what a visitor needs to get in */
+@media (max-width: 640px) {
+  .landing {
+    font-size: 16px;
+  }
   .landing__inner {
     padding: 0 16px;
+    gap: 56px;
+  }
+  .landing-nav {
+    flex-wrap: nowrap;
+    padding: 12px 0;
+  }
+  .landing-brand {
+    font-size: 19px;
+    min-width: 0;
+  }
+  .landing-nav__links {
+    flex-wrap: nowrap;
+    gap: 14px;
+    font-size: 15px;
+  }
+  .landing-nav__links a[href^="#"],
+  .landing-nav__links a[target="_blank"] {
+    display: none;
+  }
+  .landing-nav__links .btn {
+    padding: 0 14px;
+  }
+  .hero__lead {
+    font-size: 18px;
+  }
+  .hero__actions .btn,
+  .cta__actions .btn {
+    width: 100%;
+  }
+  .cta__actions {
+    align-self: stretch;
+  }
+  .features {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .feature {
+    padding: 22px;
+  }
+  .preview {
+    padding: 14px;
+    border-radius: 16px;
   }
   .preview__cols,
   .ai-demo__example {
@@ -419,7 +483,18 @@
   .ai-demo__example {
     grid-template-columns: minmax(0, 1fr);
   }
-  .hero__actions .btn {
+  .oss .btn {
     width: 100%;
+  }
+  .landing-footer {
+    flex-direction: column;
+  }
+}
+
+/* very small phones: the brand keeps only its mark */
+@media (max-width: 380px) {
+  .landing-brand {
+    font-size: 0;
+    gap: 0;
   }
 }

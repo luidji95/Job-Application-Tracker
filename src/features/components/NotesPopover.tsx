@@ -39,10 +39,18 @@ export const NotesPopover = ({
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
+  // Opens to the right of the button; when there is no room, below it and inside the screen.
+  const POPOVER_WIDTH = Math.min(320, window.innerWidth - 32);
+  const fitsRight = anchorRect.right + 12 + POPOVER_WIDTH <= window.innerWidth - 16;
+
   const style: React.CSSProperties = {
     position: "fixed",
-    top: anchorRect.top + window.scrollY,
-    left: anchorRect.right + 12 + window.scrollX,
+    top: fitsRight
+      ? Math.max(16, Math.min(anchorRect.top, window.innerHeight - 220))
+      : Math.min(anchorRect.bottom + 8, window.innerHeight - 220),
+    left: fitsRight
+      ? anchorRect.right + 12
+      : Math.max(16, Math.min(anchorRect.left, window.innerWidth - POPOVER_WIDTH - 16)),
     zIndex: 1000,
   };
 

@@ -204,3 +204,37 @@
   background: #ffffff;
   color: var(--ink);
 }
+
+/* phones: the window sits at the bottom like a sheet and the buttons fill the width */
+@media (max-width: 560px) {
+  .ai-modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .ai-modal-card {
+    width: 100%;
+    max-width: none;
+    max-height: 92vh;
+    max-height: 92dvh;
+    padding: 20px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    border-radius: 18px 18px 0 0;
+  }
+  .ai-modal-actions {
+    flex-direction: column-reverse;
+  }
+  .ai-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .ai-modal-header h2 {
+    font-size: 22px;
+  }
+  .ai-modal-textarea {
+    min-height: 140px;
+  }
+  .ai-result {
+    padding: 16px;
+  }
+}

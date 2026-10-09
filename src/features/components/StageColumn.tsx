@@ -83,7 +83,7 @@ export const StageColumn = ({
   const isApplied = id === "applied";
 
   return (
-    <section className="stage_column" data-stage={id}>
+    <section className="stage_column" id={`stage-${id}`} data-stage={id}>
       <div className="stage_column_header">
         <span className="stage_column_dot" style={{ background: color }} />
         <h3>{title}</h3>

@@ -75,3 +75,18 @@
   background: var(--surface);
   color: var(--ink);
 }
+
+@media (max-width: 860px) {
+  .stage_column {
+    scroll-snap-align: start;
+    padding: 10px;
+    /* a jump link must not leave the stage title under the bar on top */
+    scroll-margin-top: 76px;
+  }
+}
+
+@media (max-width: 560px) {
+  .stage_column_empty {
+    padding: 12px;
+  }
+}

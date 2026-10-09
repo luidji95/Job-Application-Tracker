@@ -101,3 +101,14 @@
     padding: 24px 20px;
   }
 }
+
+@media (max-width: 480px) {
+  .auth {
+    justify-content: flex-start;
+    gap: 20px;
+    padding: 24px 16px;
+  }
+  .auth-title {
+    font-size: 26px;
+  }
+}

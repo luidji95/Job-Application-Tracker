@@ -307,6 +307,17 @@ export const KanbanBoard = () => {
         </Button>
       </div>
 
+      {/* phones show the stages one under another; these links jump to a stage */}
+      <nav className="stage-jump" aria-label="Stages">
+        {DEFAULT_STAGES.map((s) => (
+          <a key={s.id} href={`#stage-${s.id}`}>
+            <span className="stage-jump__dot" style={{ background: s.color }} />
+            {s.title}
+            <b>{filteredJobs.filter((job) => job.stage === s.id).length}</b>
+          </a>
+        ))}
+      </nav>
+
       <div className="kanban-board">
         {DEFAULT_STAGES.map((s) => (
           <StageColumn

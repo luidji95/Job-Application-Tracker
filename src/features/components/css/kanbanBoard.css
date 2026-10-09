@@ -5,6 +5,9 @@
   justify-content: space-between;
   gap: 12px 24px;
   margin-bottom: 20px;
+  /* stays in place while the columns scroll sideways */
+  position: sticky;
+  left: 0;
 }
 
 .board-header h1 {
@@ -29,4 +32,80 @@
   align-items: start;
   min-width: min-content;
   padding-bottom: 120px;
+}
+
+/* narrow screens: one column at a time, swipe to the next */
+@media (max-width: 860px) {
+  .board-header h1 {
+    font-size: 26px;
+  }
+  .kanban-board {
+    grid-template-columns: repeat(6, 264px);
+    padding-bottom: 80px;
+  }
+  .kanban-board::after {
+    /* room after the last column so it can snap fully into view */
+    content: "";
+    width: 4px;
+  }
+}
+
+.stage-jump {
+  display: none;
+}
+
+/* phones: stages stacked one under another, with links on top to jump to a stage */
+@media (max-width: 560px) {
+  .kanban-board {
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+    gap: 14px;
+    padding-bottom: 24px;
+  }
+  .stage-jump {
+    display: flex;
+    gap: 6px;
+    margin: 0 -16px 14px;
+    padding: 0 16px 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .stage-jump a {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .stage-jump a:hover {
+    text-decoration: none;
+    border-color: var(--ink);
+  }
+  .stage-jump b {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .stage-jump__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+}
+
+@media (max-width: 480px) {
+  .board-header {
+    align-items: stretch;
+  }
+  .board-header .btn {
+    width: 100%;
+  }
 }

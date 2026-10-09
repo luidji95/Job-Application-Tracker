@@ -124,3 +124,41 @@
   background: var(--accent);
   border-radius: 7px;
 }
+
+@media (max-width: 860px) {
+  /* the bar on top already has a link to the board */
+  .stats-back {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .statistics-page {
+    gap: 20px;
+  }
+  .statistics-header h1 {
+    font-size: 26px;
+  }
+  .statistics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .stat-card {
+    padding: 14px;
+  }
+  /* five cards in two columns: the total takes the full first row */
+  .stat-card:first-child {
+    grid-column: 1 / -1;
+  }
+  .stat-card p {
+    font-size: 28px;
+  }
+  .statistics-section {
+    padding: 16px;
+  }
+  .stage-breakdown-item {
+    grid-template-columns: 88px minmax(0, 1fr) 28px;
+    gap: 8px;
+    font-size: 13.5px;
+  }
+}

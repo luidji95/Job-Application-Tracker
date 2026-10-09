@@ -24,9 +24,9 @@ export const Sidebar = ({ userName, isDemo = false, onLogout }: SidebarProps) =>
 
   return (
     <div className="sidebar">
-      <Link to="/dashboard" className="sidebar-brand">
+      <Link to="/dashboard" className="sidebar-brand" aria-label="JobFlowTracker">
         <Logo size={24} tone="light" />
-        JobFlowTracker
+        <span className="sidebar-label">JobFlowTracker</span>
       </Link>
 
       <nav className="sidebar-main" aria-label="Dashboard">
@@ -36,7 +36,7 @@ export const Sidebar = ({ userName, isDemo = false, onLogout }: SidebarProps) =>
           aria-current={!isStatistics ? "page" : undefined}
         >
           <Kanban size={18} aria-hidden="true" />
-          Board
+          <span>Board</span>
         </Link>
 
         <Link
@@ -45,12 +45,12 @@ export const Sidebar = ({ userName, isDemo = false, onLogout }: SidebarProps) =>
           aria-current={isStatistics ? "page" : undefined}
         >
           <BarChart3 size={18} aria-hidden="true" />
-          Statistics
+          <span>Statistics</span>
         </Link>
 
         <span className="sidebar-item sidebar-item--soon">
           <Settings size={18} aria-hidden="true" />
-          Settings
+          <span className="sidebar-label">Settings</span>
           <span className="sidebar-soon">soon</span>
         </span>
       </nav>
@@ -64,9 +64,9 @@ export const Sidebar = ({ userName, isDemo = false, onLogout }: SidebarProps) =>
           </span>
         </div>
 
-        <button type="button" className="sidebar-logout" onClick={onLogout}>
+        <button type="button" className="sidebar-logout" onClick={onLogout} aria-label="Log out">
           <LogOut size={16} aria-hidden="true" />
-          Log out
+          <span className="sidebar-label">Log out</span>
         </button>
       </div>
     </div>
