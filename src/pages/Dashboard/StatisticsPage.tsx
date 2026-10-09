@@ -131,7 +131,7 @@ export const StatisticsPage = () => {
   }, [jobs]);
 
   if (isLoading) {
-    return <div className="statistics-page">Loading...</div>;
+    return <div className="page-loading">Loading statistics...</div>;
   }
 
   if (error) {
@@ -208,30 +208,29 @@ export const StatisticsPage = () => {
         </p>
 
         <div className="stage-breakdown-list">
-          <div className="stage-breakdown-item">
-            <span>Applied</span>
-            <strong>{stats.totalApplications}</strong>
-          </div>
-
-          <div className="stage-breakdown-item">
-            <span>HR Interview</span>
-            <strong>{stats.reachedHR}</strong>
-          </div>
-
-          <div className="stage-breakdown-item">
-            <span>Technical</span>
-            <strong>{stats.reachedTechnical}</strong>
-          </div>
-
-          <div className="stage-breakdown-item">
-            <span>Final</span>
-            <strong>{stats.reachedFinal}</strong>
-          </div>
-
-          <div className="stage-breakdown-item">
-            <span>Offer</span>
-            <strong>{stats.reachedOffer}</strong>
-          </div>
+          {[
+            { label: "Applied", value: stats.totalApplications },
+            { label: "HR Interview", value: stats.reachedHR },
+            { label: "Technical", value: stats.reachedTechnical },
+            { label: "Final", value: stats.reachedFinal },
+            { label: "Offer", value: stats.reachedOffer },
+          ].map((row) => (
+            <div className="stage-breakdown-item" key={row.label}>
+              <span>{row.label}</span>
+              <div className="stage-breakdown-bar">
+                <i
+                  style={{
+                    width: `${
+                      stats.totalApplications > 0
+                        ? (row.value / stats.totalApplications) * 100
+                        : 0
+                    }%`,
+                  }}
+                />
+              </div>
+              <strong>{row.value}</strong>
+            </div>
+          ))}
         </div>
       </div>
     </div>

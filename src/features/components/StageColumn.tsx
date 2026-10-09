@@ -1,7 +1,6 @@
 import "./css/stageColumn.css";
 import { Plus } from "lucide-react";
 import { CompanyCard } from "./CompanyCard";
-import { Button } from "../../components/ui/Button";
 
 type StatusVariant = "active" | "accepted" | "rejected";
 
@@ -55,6 +54,15 @@ type StageColumnProps = {
   activeJobId?: string | null;
 };
 
+const EMPTY_TEXT: Record<StageId, string> = {
+  applied: "No applications yet. Add the first one.",
+  "hr-interview": "Nothing here yet. Move a card when you get the call.",
+  technical: "Nothing here yet. Move a card when you get to this round.",
+  final: "Nothing here yet. Move a card when you get to this round.",
+  offer: "No offers yet.",
+  rejected: "No rejections.",
+};
+
 export const StageColumn = ({
   id,
   title,
@@ -75,30 +83,16 @@ export const StageColumn = ({
   const isApplied = id === "applied";
 
   return (
-    <div className="stage_column" data-stage={id}>
-      <div className="stage_column_header" style={{ borderTopColor: color }}>
+    <section className="stage_column" data-stage={id}>
+      <div className="stage_column_header">
+        <span className="stage_column_dot" style={{ background: color }} />
         <h3>{title}</h3>
         <span className="jobs_column_count">{jobs.length}</span>
-
-        {isApplied && onAddJob && (
-          <Button
-            variant="primary"
-            size="sm"
-            className="toolbar-btn"
-            isLoading={isAdding}
-            disabled={isAdding}
-            type="button"
-            onClick={() => onAddJob(id)}
-          >
-            <Plus size={16} />
-            <span>Add new</span>
-          </Button>
-        )}
       </div>
 
       <div className="stage_column_body">
         {jobs.length === 0 ? (
-          <p className="stage_column_empty">No jobs yet</p>
+          <p className="stage_column_empty">{EMPTY_TEXT[id]}</p>
         ) : (
           jobs.map((job) => {
             const action = getJobAction?.(job.id) ?? null;
@@ -134,6 +128,18 @@ export const StageColumn = ({
           })
         )}
       </div>
-    </div>
+
+      {isApplied && onAddJob && (
+        <button
+          type="button"
+          className="stage_column_add"
+          disabled={isAdding}
+          onClick={() => onAddJob(id)}
+        >
+          <Plus size={15} aria-hidden="true" />
+          Add
+        </button>
+      )}
+    </section>
   );
 };

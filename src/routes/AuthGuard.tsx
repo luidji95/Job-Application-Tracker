@@ -38,7 +38,7 @@ export function AuthGuard() {
     };
   }, []);
 
-  if (isChecking) return <div style={{ padding: 24 }}>Checking session...</div>;
+  if (isChecking) return <div className="page-loading">Checking session...</div>;
 
   if (!session) {
     return <Navigate to="/login" replace state={{ from: location }} />;

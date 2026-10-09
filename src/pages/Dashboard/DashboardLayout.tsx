@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import "./dashboard.css";
 
 import { Topbar } from "../../features/components/Topbar";
@@ -45,6 +45,9 @@ const DashboardLayout = () => {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
 
+  const navigate = useNavigate();
+  const isDemo = localStorage.getItem("is_demo") === "1";
+
   useEffect(() => {
     const loadProfile = async () => {
       const {
@@ -69,6 +72,26 @@ const DashboardLayout = () => {
 
     loadProfile();
   }, []);
+
+  const handleLogout = async () => {
+    const isDemo = localStorage.getItem("is_demo") === "1";
+
+    if (isDemo) {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (!error && user) {
+        await deleteAllJobsDb(user.id);
+      }
+
+      localStorage.removeItem("is_demo");
+    }
+
+    await supabase.auth.signOut();
+    navigate("/login", { replace: true });
+  };
 
   const handleSeedClick = async () => {
     try {
@@ -119,13 +142,16 @@ const DashboardLayout = () => {
   return (
     <div className="dash">
       <aside className="dash__sidebar">
-        <Sidebar />
+        <Sidebar
+          userName={profile?.userName ?? profile?.email ?? "User"}
+          isDemo={isDemo}
+          onLogout={handleLogout}
+        />
       </aside>
 
       <div className="dash__right">
         <div className="dash__topbar">
           <Topbar
-            userName={profile?.userName ?? profile?.email ?? "User"}
             onSeedClick={handleSeedClick}
             onDeleteAll={handleDeleteAllClick}
             searchValue={searchValue}

@@ -1,28 +1,74 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { BarChart3, Kanban, LogOut, Settings } from "lucide-react";
+import { Logo } from "../../components/ui/Logo";
 import "./css/sidebar.css";
 
-export const Sidebar = () => {
-  const navigate = useNavigate();
+type SidebarProps = {
+  userName: string;
+  isDemo?: boolean;
+  onLogout: () => void;
+};
+
+const getInitials = (name: string) =>
+  name
+    .split(/[\s@._-]+/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2) || "U";
+
+export const Sidebar = ({ userName, isDemo = false, onLogout }: SidebarProps) => {
   const location = useLocation();
+  const isStatistics = location.pathname === "/dashboard/statistics";
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-title">Job Application Tracker</div>
+    <div className="sidebar">
+      <Link to="/dashboard" className="sidebar-brand">
+        <Logo size={24} tone="light" />
+        JobFlowTracker
+      </Link>
 
-      <nav className="sidebar-main">
-        <ul>
-          <li
-            className={`sidebar-item ${
-              location.pathname === "/dashboard/statistics" ? "active" : ""
-            }`}
-            onClick={() => navigate("/dashboard/statistics")}
-          >
-            Statistics
-          </li>
+      <nav className="sidebar-main" aria-label="Dashboard">
+        <Link
+          to="/dashboard"
+          className={`sidebar-item ${!isStatistics ? "active" : ""}`}
+          aria-current={!isStatistics ? "page" : undefined}
+        >
+          <Kanban size={18} aria-hidden="true" />
+          Board
+        </Link>
 
-          <li className="sidebar-item">Settings (coming soon)</li>
-        </ul>
+        <Link
+          to="/dashboard/statistics"
+          className={`sidebar-item ${isStatistics ? "active" : ""}`}
+          aria-current={isStatistics ? "page" : undefined}
+        >
+          <BarChart3 size={18} aria-hidden="true" />
+          Statistics
+        </Link>
+
+        <span className="sidebar-item sidebar-item--soon">
+          <Settings size={18} aria-hidden="true" />
+          Settings
+          <span className="sidebar-soon">soon</span>
+        </span>
       </nav>
-    </aside>
+
+      <div className="sidebar-user">
+        <div className="sidebar-user__row">
+          <span className="sidebar-avatar">{getInitials(userName)}</span>
+          <span className="sidebar-user__text">
+            <strong>{userName}</strong>
+            {isDemo && <small>Guest demo</small>}
+          </span>
+        </div>
+
+        <button type="button" className="sidebar-logout" onClick={onLogout}>
+          <LogOut size={16} aria-hidden="true" />
+          Log out
+        </button>
+      </div>
+    </div>
   );
 };

@@ -14,6 +14,8 @@ import { ApplicationModal } from "./ModalComponents/ApplicationModal";
 import { ConfirmModal } from "./ModalComponents/ConfirmModal";
 
 import { useOutletContext } from "react-router-dom";
+import { Plus } from "lucide-react";
+import { Button } from "../../components/ui/Button";
 import type { DashboardOutletContext } from "../../pages/Dashboard/DashboardLayout";
 
 type NewJobData = {
@@ -264,13 +266,46 @@ export const KanbanBoard = () => {
     }
   };
 
+  const openCreateModal = () => {
+    setModalMode("create");
+    setEditingJob(null);
+    setModalOpen(true);
+  };
+
+  // one line under the title: what is in play right now
+  const activeCount = jobs.filter((j) => j.status === "active").length;
+  const interviewCount = jobs.filter(
+    (j) =>
+      j.status === "active" &&
+      (j.stage === "hr-interview" || j.stage === "technical" || j.stage === "final")
+  ).length;
+  const offerCount = jobs.filter((j) => j.stage === "offer").length;
+  const summary =
+    jobs.length === 0
+      ? "No applications yet. Add the first one or load sample data."
+      : `${activeCount} active · ${interviewCount} in interviews · ${offerCount} ${
+          offerCount === 1 ? "offer" : "offers"
+        }`;
+
   if (isLoading) {
-    return <div className="kanban-board">Loading jobs...</div>;
+    return <div className="page-loading">Loading applications...</div>;
   }
 
   return (
     <>
       {error && <ErrorBanner message={error} onClose={() => setError(null)} />}
+
+      <div className="board-header">
+        <div>
+          <h1>My job search</h1>
+          <p>{summary}</p>
+        </div>
+
+        <Button onClick={openCreateModal} isLoading={isAdding} disabled={isAdding}>
+          <Plus size={16} aria-hidden="true" />
+          New application
+        </Button>
+      </div>
 
       <div className="kanban-board">
         {DEFAULT_STAGES.map((s) => (
@@ -280,11 +315,7 @@ export const KanbanBoard = () => {
             title={s.title}
             color={s.color}
             jobs={filteredJobs.filter((job) => job.stage === s.id)}
-            onAddJob={() => {
-              setModalMode("create");
-              setEditingJob(null);
-              setModalOpen(true);
-            }}
+            onAddJob={openCreateModal}
             onMoveJob={handleMoveJob}
             onRestoreJob={handleRestoreJob}
             onEditJob={openEditJob}

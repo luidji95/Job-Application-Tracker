@@ -1,45 +1,44 @@
 .dash {
   height: 100vh;
   display: grid;
-  grid-template-columns: 260px 1fr;
-
-
-  background:
-    radial-gradient(circle at 20% 50%, rgba(20, 184, 166, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.10) 0%, transparent 50%),
-    radial-gradient(circle at 40% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+  grid-template-columns: 232px minmax(0, 1fr);
+  background: var(--bg);
 }
 
 .dash__sidebar {
   height: 100vh;
   overflow: auto;
-
-
-  background: rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(12px);
-  border-right: 1px solid rgba(255,255,255,0.08);
+  background: var(--navy);
 }
 
 .dash__right {
   height: 100vh;
+  min-width: 0;
   display: grid;
-  grid-template-rows: auto 1fr; 
-  overflow: hidden;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
+/* above the board so the search results are not covered by cards */
 .dash__topbar {
-
-  background: rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
   position: relative;
-  z-index: 2000;
-  overflow: visible;
+  z-index: 20;
+  border-bottom: 1px solid var(--line);
 }
-
 
 .dash__kanban {
-  background: #050505;
   overflow: auto;
-  padding: 12px;
+  padding: 24px clamp(16px, 2.4vw, 32px) 32px;
+}
+
+@media (max-width: 860px) {
+  .dash {
+    height: auto;
+    min-height: 100vh;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .dash__sidebar,
+  .dash__right {
+    height: auto;
+  }
 }

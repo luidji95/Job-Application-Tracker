@@ -9,6 +9,7 @@ import { PasswordInput } from "../../../components/ui/PasswordInput";
 import { Button } from "../../../components/ui/Button";
 import { AuthLayout } from "../../../layouts/AuthLayout/AuthLayout";
 import { supabase } from "../../../lib/supabaseClient";
+import { signInAsGuest } from "../../../lib/auth/guestDemo";
 
 import { loginSchema } from "../../../schemas/auth.schema";
 
@@ -71,24 +72,7 @@ export const LoginPage = () => {
     setDemoLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke("create-guest");
-
-      if (error) throw error;
-
-      const { email, password } = data as {
-        email: string;
-        password: string;
-      };
-
-      const { error: signInErr } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (signInErr) throw signInErr;
-
-      localStorage.setItem("is_demo", "1");
-
+      await signInAsGuest();
       navigate("/dashboard");
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -103,26 +87,34 @@ export const LoginPage = () => {
 
   return (
     <AuthLayout
-      title="Login"
-      subtitle="Enter your credentials to access your dashboard."
+      title="Log in"
+      subtitle="Enter your credentials to open your board."
     >
       <form className="form" onSubmit={handleSubmit(onSubmit)}>
         <Input
           label="Email"
           placeholder="you@example.com"
+          autoComplete="email"
           {...register("email")}
           error={errors.email?.message}
         />
 
         <PasswordInput
           placeholder="••••••••"
+          autoComplete="current-password"
           {...register("password")}
           error={errors.password?.message}
         />
 
+        {error && (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        )}
+
         <div className="form-actions">
           <Button type="submit" isLoading={isLoading}>
-            Login
+            Log in
           </Button>
 
           <Button
@@ -130,25 +122,12 @@ export const LoginPage = () => {
             type="button"
             className="guest-demo-btn"
             onClick={handleTryDemo}
+            isLoading={demoLoading}
             disabled={isLoading || demoLoading}
           >
-            <span className="guest-icon">👁️</span>
-            Try demo as guest
+            Try the demo as a guest
           </Button>
         </div>
-
-        {error && (
-          <p
-            style={{
-              color: "red",
-              marginTop: "10px",
-              border: "1px solid red",
-              padding: 8,
-            }}
-          >
-            {error}
-          </p>
-        )}
 
         <p className="form-footer">
           Don't have an account? <Link to="/register">Create one</Link>

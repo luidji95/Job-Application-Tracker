@@ -10,7 +10,7 @@ export const ErrorBanner = ({ message, onClose }: ErrorBannerProps) => {
 
   return (
     <div className="error-banner" role="alert">
-      <span className="error-banner__text">{message} Failed to load jobs...</span>
+      <span className="error-banner__text">{message}</span>
 
       {onClose && (
         <button

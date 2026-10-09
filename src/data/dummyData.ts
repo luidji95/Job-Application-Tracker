@@ -57,10 +57,10 @@ export const DUMMY_JOBS: JobType[] = [
 ];
 
 export const DEFAULT_STAGES: { id: StageId; title: string; color: string }[] = [
-  { id: 'applied', title: 'Applied', color: '#4f46e5' },
-  { id: 'hr-interview', title: 'HR Interview', color: '#7c3aed' },
-  { id: 'technical', title: 'Technical Interview', color: '#059669' },
-  { id: 'final', title: 'Final Interview', color: '#d97706' },
-  { id: 'offer', title: 'Offer', color: '#3b82f6' },
-  { id: 'rejected', title: 'Rejected', color: '#ef4444' },
+  { id: 'applied', title: 'Applied', color: '#6b748a' },
+  { id: 'hr-interview', title: 'HR interview', color: '#3445e0' },
+  { id: 'technical', title: 'Technical', color: '#7a3ff2' },
+  { id: 'final', title: 'Final', color: '#a85a00' },
+  { id: 'offer', title: 'Offer', color: '#0b7a5a' },
+  { id: 'rejected', title: 'Rejected', color: '#b4232c' },
 ];

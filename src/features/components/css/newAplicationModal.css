@@ -1,178 +1,124 @@
+/* Shared by the application form and the confirm dialog */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.55);
+  z-index: 5000;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  z-index: 999;
+  padding: 24px 16px;
+  background: rgba(18, 23, 43, 0.55);
 }
 
 .modal-card {
   width: 100%;
   max-width: 640px;
-  background: #fff;
-  border-radius: 16px;
-  padding: 18px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  background: var(--surface);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
 }
 
 .modal-header {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 12px;
-  margin-bottom: 14px;
 }
 
 .modal-title h2 {
   margin: 0;
-  font-size: 18px;
+  font-family: var(--font-display);
   font-weight: 700;
-  color: #0f172a;
+  font-size: 24px;
+  line-height: 1.15;
+  color: var(--ink);
 }
 
 .modal-title p {
-  margin: 4px 0 0;
-  font-size: 13px;
-  color: #64748b;
+  margin: 6px 0 0;
+  color: var(--muted);
 }
 
 .modal-close {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 18px;
-  line-height: 1;
-  padding: 6px 8px;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border: 0;
   border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
 }
-
-.modal-close:hover {
-  background: #f1f5f9;
+.modal-close:hover:not(:disabled) {
+  background: var(--bg);
+  color: var(--ink);
 }
 
 .modal-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 20px;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .field-full {
   grid-column: 1 / -1;
 }
 
-.field label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #334155;
-}
-
-.field input,
-.field textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  outline: none;
-  font-size: 14px;
-  color: #0f172a;
-  background: #fff;
-}
-
-.field input:focus,
-.field textarea:focus {
-  border-color: #94a3b8;
-  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.25);
-}
-
-.tags-preview {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 6px;
-}
-
-.tag-chip {
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #f1f5f9;
-  color: #0f172a;
-  border: 1px solid #e2e8f0;
-}
-
 .modal-actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 10px;
-  padding-top: 6px;
-  border-top: 1px solid #eef2f7;
 }
 
-.btn {
-  border: none;
-  cursor: pointer;
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-size: 14px;
-  font-weight: 600;
+.modal-actions .btn {
+  min-height: 44px;
+  padding: 0 18px;
+  font-size: 15px;
 }
 
-.btn-ghost {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  color: #0f172a;
+.modal-actions .btn-ghost {
+  background: transparent;
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+.modal-actions .btn-ghost:hover:not(:disabled) {
+  border-color: var(--ink);
 }
 
-.btn-ghost:hover {
-  background: #f8fafc;
+.modal-actions .btn-primary {
+  background: var(--accent);
+  color: #ffffff;
+}
+.modal-actions .btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
 }
 
-.btn-primary {
-  background: #0f172a;
-  color: #fff;
+.modal-actions .btn-primary.btn-danger {
+  background: var(--danger);
+}
+.modal-actions .btn-primary.btn-danger:hover:not(:disabled) {
+  background: #8e1b22;
 }
 
-.btn-primary:hover {
-  opacity: 0.92;
-}
-
-/* Responsive */
 @media (max-width: 560px) {
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
-}
-
-
-.field-error {
-  color: #dc2626;
-  font-size: 12px;
-  margin-top: 4px;
-  display: block;
-}
-
-.field-hint {
-  color: #6b7280;
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  .modal-card {
+    padding: 20px 16px;
+  }
 }

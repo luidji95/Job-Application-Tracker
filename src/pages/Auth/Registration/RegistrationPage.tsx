@@ -142,8 +142,8 @@ export const RegistrationPage = () => {
         {errors.terms && <p className="error">{errors.terms.message}</p>}
 
         <div className="form-actions">
-          {message ? <p style={{ color: "green" }}>{message}</p> : null}
-          {error ? <p style={{ color: "red" }}>{error}</p> : null}
+          {message ? <p className="form-success">{message}</p> : null}
+          {error ? <p className="form-error" role="alert">{error}</p> : null}
 
           <Button type="submit" isLoading={isLoading}>
             Create account
