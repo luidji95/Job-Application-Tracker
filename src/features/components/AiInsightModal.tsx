@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
+import { getFunctionErrorMessage } from "../../lib/functionsError";
 import { useJobs } from "./context/useJobs";
 import type { JobType } from "./StageColumn";
 import "../components/css/aiPopover.css";
@@ -98,15 +99,7 @@ export const AiInsightModal = ({ job, onClose }: AiInsightModalProps) => {
       });
 
       if (error) {
-        const errorMessage =
-          typeof error === "object" &&
-          error !== null &&
-          "context" in error &&
-          error.context instanceof Response
-            ? await error.context.text()
-            : error.message || "Failed to call AI function.";
-
-        throw new Error(errorMessage);
+        throw new Error(await getFunctionErrorMessage(error, "AI analysis failed."));
       }
 
       if (!data?.content) {
