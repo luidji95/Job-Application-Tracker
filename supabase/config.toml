@@ -410,3 +410,10 @@ entrypoint = "./functions/analyze-job/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/analyze-job/*.html" ]
+
+# Public status check used by the keep-awake workflow; it needs no key.
+[functions.health]
+enabled = true
+verify_jwt = false
+import_map = "./functions/health/deno.json"
+entrypoint = "./functions/health/index.ts"
