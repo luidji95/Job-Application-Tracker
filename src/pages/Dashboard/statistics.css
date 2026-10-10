@@ -162,3 +162,100 @@
     font-size: 13.5px;
   }
 }
+
+/* timing */
+.timing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.timing-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  background: var(--bg);
+  border-radius: 12px;
+}
+.timing-item__label {
+  font-size: 14px;
+  color: var(--muted);
+}
+.timing-item strong {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+/* a sentence in place of a number reads better small */
+.timing-item strong.is-empty {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.timing-item small {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.waiting-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.waiting-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+.waiting-list strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.waiting-list__days {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-empty {
+  margin: 0;
+  color: var(--muted);
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14.5px;
+}
+.stats-table th,
+.stats-table td {
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  font-weight: 400;
+}
+.stats-table thead th {
+  border-top: 0;
+  padding-top: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.stats-table tbody th {
+  font-weight: 600;
+}
+.stats-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.stats-table .muted {
+  color: var(--muted);
+}

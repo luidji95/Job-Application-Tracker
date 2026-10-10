@@ -293,3 +293,32 @@ export const fetchStageEvents = async (
   if (error) throw error;
   return (data ?? []) as Pick<JobEvent, "job_id" | "type" | "created_at">[];
 };
+
+/**
+  Every recorded event of the user's applications, oldest first, for the
+  statistics page. Read in pages, because the API returns at most 1000 rows at once.
+ */
+export const fetchAllEvents = async (userId: string): Promise<JobEvent[]> => {
+  requireUserId(userId);
+
+  const PAGE = 1000;
+  const MAX_PAGES = 10;
+  const all: JobEvent[] = [];
+
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const { data, error } = await supabase
+      .from("job_events")
+      .select("id,job_id,type,from_stage,to_stage,detail,step_date,inferred,created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true })
+      .range(page * PAGE, page * PAGE + PAGE - 1);
+
+    if (error) throw error;
+
+    all.push(...((data ?? []) as JobEvent[]));
+    if (!data || data.length < PAGE) break;
+  }
+
+  return all;
+};
