@@ -117,3 +117,20 @@
 .kanban-board.is-dragging {
   cursor: grabbing;
 }
+
+/* next steps that need attention, under the summary line */
+.board-header .board-header__steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.board-header__overdue {
+  padding: 1px 8px;
+  border-radius: 6px;
+  background: #fdf0d5;
+  color: #7a4a00;
+  font-weight: 600;
+}

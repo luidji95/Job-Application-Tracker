@@ -23,6 +23,10 @@ export type JobRow = {
   applied_date: string;
   rejected_from_stage: string | null;
 
+  next_step?: string | null;
+  next_step_date?: string | null;
+  job_url?: string | null;
+
   // optional 
   accepted_at?: string | null;
 
@@ -36,6 +40,9 @@ export type NewJobData = {
   salary?: string;
   tags?: string; 
   notes?: string;
+  nextStep?: string;
+  nextStepDate?: string;
+  jobUrl?: string;
 };
 
 export type UpdateJobData = {
@@ -45,6 +52,9 @@ export type UpdateJobData = {
   salary?: string;
   tags?: string; 
   notes?: string;
+  nextStep?: string;
+  nextStepDate?: string;
+  jobUrl?: string;
 };
 
 const TABLE = "jobs";
@@ -67,6 +77,9 @@ const rowToJob = (row: JobRow): JobType => {
     salary: row.salary ?? undefined,
     tags: (row.tags ?? []) as string[],
     notes: row.notes ?? undefined,
+    next_step: row.next_step ?? undefined,
+    next_step_date: row.next_step_date ?? undefined,
+    job_url: row.job_url ?? undefined,
   };
 };
 
@@ -85,7 +98,7 @@ export const fetchJobs = async (userId: string): Promise<JobType[]> => {
   const { data, error } = await supabase
     .from(TABLE)
     .select(
-      "id,user_id,company_name,position,stage,status,location,salary,tags,notes,applied_date,rejected_from_stage,created_at"
+      "id,user_id,company_name,position,stage,status,location,salary,tags,notes,applied_date,rejected_from_stage,next_step,next_step_date,job_url,created_at"
     )
     .eq("user_id", userId)
     
@@ -115,6 +128,9 @@ export const createJob = async (userId: string, payload: NewJobData): Promise<Jo
     notes: pickStringOrNull(payload.notes),
     applied_date: new Date().toISOString(),
     rejected_from_stage: null,
+    next_step: pickStringOrNull(payload.nextStep),
+    next_step_date: pickStringOrNull(payload.nextStepDate),
+    job_url: pickStringOrNull(payload.jobUrl),
   };
 
   const { data, error } = await supabase.from(TABLE).insert(insertRow).select().single();
@@ -142,6 +158,9 @@ export const updateJob = async (
   if (payload.salary !== undefined) patch.salary = pickStringOrNull(payload.salary);
   if (payload.tags !== undefined) patch.tags = normalizeTags(payload.tags);
   if (payload.notes !== undefined) patch.notes = pickStringOrNull(payload.notes);
+  if (payload.nextStep !== undefined) patch.next_step = pickStringOrNull(payload.nextStep);
+  if (payload.nextStepDate !== undefined) patch.next_step_date = pickStringOrNull(payload.nextStepDate);
+  if (payload.jobUrl !== undefined) patch.job_url = pickStringOrNull(payload.jobUrl);
 
   const { data, error } = await supabase
     .from(TABLE)

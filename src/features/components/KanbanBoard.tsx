@@ -8,6 +8,8 @@ import { NotesPopover } from "./NotesPopover";
 import { AiInsightModal } from "./AiInsightModal";
 import { useJobs } from "./context/useJobs";
 import { filterJobs } from "../../lib/jobs/jobSearch";
+import { summarizeNextSteps } from "../../lib/jobs/nextStep";
+import type { NewJobData } from "./context/JobsContext";
 
 import { toast } from "sonner";
 import { ErrorBanner } from "../../components/ui/ErrorBanner";
@@ -33,15 +35,6 @@ import { isValidStageId } from "../../lib/jobs/jobUtils";
 import { Plus } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import type { DashboardOutletContext } from "../../pages/Dashboard/DashboardLayout";
-
-type NewJobData = {
-  company_name: string;
-  position: string;
-  location?: string;
-  salary?: string;
-  tags?: string;
-  notes?: string;
-};
 
 type CardActionType = "move" | "delete" | "restore" | "update";
 type ActionState =
@@ -261,6 +254,32 @@ export const KanbanBoard = () => {
     }
   };
 
+  // The check mark on a card: the step is done, so it is cleared. Other fields stay as they are.
+  const handleCompleteStep = async (jobId: string) => {
+    const job = jobs.find((j) => j.id === jobId);
+    if (!job) return;
+
+    try {
+      setError(null);
+      setAction({ type: "update", jobId });
+
+      await editJob(jobId, {
+        company_name: job.company_name,
+        position: job.position,
+        next_step: "",
+        next_step_date: "",
+      });
+
+      toast.success("Step marked as done");
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Failed to update the step";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setAction(null);
+    }
+  };
+
   const handleOpenNotes = (jobId: string, anchorRect: DOMRect) => {
     setNotesState({ jobId, anchorRect });
   };
@@ -317,6 +336,9 @@ export const KanbanBoard = () => {
           offerCount === 1 ? "offer" : "offers"
         }`;
 
+  // what needs attention: late steps and steps due in the next seven days
+  const steps = summarizeNextSteps(jobs, new Date());
+
   if (isLoading) {
     return <div className="page-loading">Loading applications...</div>;
   }
@@ -329,6 +351,18 @@ export const KanbanBoard = () => {
         <div>
           <h1>My job search</h1>
           <p>{summary}</p>
+          {(steps.overdue > 0 || steps.dueThisWeek > 0) && (
+            <p className="board-header__steps">
+              {steps.overdue > 0 && (
+                <span className="board-header__overdue">{steps.overdue} overdue</span>
+              )}
+              {steps.dueThisWeek > 0 && (
+                <span>
+                  {steps.dueThisWeek} due this week
+                </span>
+              )}
+            </p>
+          )}
         </div>
 
         <Button onClick={openCreateModal} isLoading={isAdding} disabled={isAdding}>
@@ -373,6 +407,7 @@ export const KanbanBoard = () => {
             isAdding={isAdding}
             onOpenNotes={handleOpenNotes}
             onOpenAi={handleOpenAi}
+            onCompleteStep={handleCompleteStep}
             activeJobId={activeJobId}
             draggedFromStage={draggedJob?.stage ?? null}
           />

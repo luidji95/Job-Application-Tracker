@@ -130,6 +130,9 @@ Deno.serve(async (req) => {
 
     const userId = created.user.id;
     const now = new Date().toISOString();
+    // calendar dates for the demo steps: one a few days ahead, one already late
+    const dayFromNow = (days: number) =>
+      new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
     // Create/Upsert profile
     const { error: profileErr } = await admin.from("profiles").upsert({
@@ -156,6 +159,9 @@ Deno.serve(async (req) => {
         notes: "Demo job – try moving/editing.",
         rejected_from_stage: null,
         tags: ["React", "TypeScript"],
+        next_step: "Send a follow-up",
+        next_step_date: dayFromNow(-2),
+        job_url: null,
       },
       {
         user_id: userId,
@@ -169,6 +175,9 @@ Deno.serve(async (req) => {
         notes: "Demo job – add notes.",
         rejected_from_stage: null,
         tags: ["React", "Redux"],
+        next_step: "HR call",
+        next_step_date: dayFromNow(3),
+        job_url: null,
       },
       {
         user_id: userId,
@@ -182,6 +191,9 @@ Deno.serve(async (req) => {
         notes: "Demo job – try restore.",
         rejected_from_stage: "applied",
         tags: ["CSS", "UI"],
+        next_step: null,
+        next_step_date: null,
+        job_url: null,
       },
     ]);
 

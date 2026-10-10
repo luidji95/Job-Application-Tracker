@@ -28,6 +28,11 @@ export type JobType = {
   location?: string;
   tags?: string[];
   notes?: string;
+
+  // what to do next and when (YYYY-MM-DD), and the link to the job ad
+  next_step?: string;
+  next_step_date?: string;
+  job_url?: string;
 };
 
 type StageOption = {
@@ -48,6 +53,7 @@ type StageColumnProps = {
   onDeleteJob?: (jobId: string) => void;
   onOpenNotes?: (jobId: string, anchorRect: DOMRect) => void;
   onOpenAi?: (jobId: string) => void;
+  onCompleteStep?: (jobId: string) => void;
 
   allStages: StageOption[];
   getJobAction?: (jobId: string) => "move" | "delete" | "restore" | "update" | null;
@@ -81,6 +87,7 @@ export const StageColumn = ({
   isAdding = false,
   onOpenNotes,
   onOpenAi,
+  onCompleteStep,
   activeJobId,
   draggedFromStage = null,
 }: StageColumnProps) => {
@@ -132,6 +139,7 @@ export const StageColumn = ({
                 onDelete={onDeleteJob}
                 onOpenNotes={onOpenNotes}
                 onOpenAi={onOpenAi}
+                onCompleteStep={onCompleteStep}
                 allStages={allStages}
                 disabled={disabled}
                 busyLabel={busyLabel}

@@ -1,13 +1,17 @@
 import { createContext } from "react";
 import type { JobType, StageId } from "../StageColumn";
 
-type NewJobData = {
+// What the application form sends. Fields left out of an edit keep their stored value.
+export type NewJobData = {
   company_name: string;
   position: string;
   location?: string;
   salary?: string;
   tags?: string;
   notes?: string;
+  next_step?: string;
+  next_step_date?: string;
+  job_url?: string;
 };
 
 export type JobsContextValue = {

@@ -302,3 +302,75 @@
   font-size: 13.5px;
   color: var(--ink-2);
 }
+
+/* next step */
+.company_card_step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 4px 8px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: #23309c;
+}
+.company_card_step > svg {
+  flex: 0 0 auto;
+}
+.company_card_step_text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+.company_card_step_text strong {
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.company_card_step_text small {
+  font-size: 12px;
+}
+
+/* due today: same blue, heavier edge */
+.company_card_step--today {
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+/* late: amber, with its own icon, so it does not rely on colour alone */
+.company_card_step--overdue {
+  background: #fdf0d5;
+  color: #7a4a00;
+}
+.company_card:has(.company_card_step--overdue) {
+  border-color: #c98a1b;
+}
+
+.company_card_step_done {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid currentColor;
+  border-radius: 7px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.company_card_step_done:hover:not(:disabled) {
+  background: var(--surface);
+}
+
+a.card_icon_btn:hover {
+  text-decoration: none;
+  background: var(--bg);
+}
+
+@media (max-width: 860px), (pointer: coarse) {
+  .company_card_step_done {
+    width: 40px;
+    height: 40px;
+  }
+}

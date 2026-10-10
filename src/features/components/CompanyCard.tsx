@@ -1,5 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { MapPin, MoreHorizontal, Sparkles, StickyNote } from "lucide-react";
+import {
+  AlertTriangle,
+  CalendarClock,
+  Check,
+  ExternalLink,
+  MapPin,
+  MoreHorizontal,
+  Sparkles,
+  StickyNote,
+} from "lucide-react";
+import { getNextStep } from "../../lib/jobs/nextStep";
 import { useDraggable } from "@dnd-kit/core";
 import "./css/companyCard.css";
 import type { JobType, StageId } from "./StageColumn";
@@ -16,6 +26,7 @@ type CompanyCardProps = JobType & {
   onDelete?: (jobId: string) => void;
   onOpenNotes?: (jobId: string, anchorRect: DOMRect) => void;
   onOpenAi?: (jobId: string) => void;
+  onCompleteStep?: (jobId: string) => void;
   allStages: StageOption[];
   disabled?: boolean;
   busyLabel?: string | null;
@@ -88,6 +99,9 @@ export const CompanyCard = ({
   salary,
   tags = [],
   notes,
+  next_step,
+  next_step_date,
+  job_url,
   status,
   rejected_from_stage,
   onMove,
@@ -96,6 +110,7 @@ export const CompanyCard = ({
   onDelete,
   onOpenNotes,
   onOpenAi,
+  onCompleteStep,
   allStages,
   disabled = false,
   busyLabel = null,
@@ -159,6 +174,7 @@ export const CompanyCard = ({
 
   const meta = [location, salary].filter(Boolean);
   const hasNotes = Boolean(notes && notes.trim());
+  const nextStep = getNextStep({ stage, next_step, next_step_date }, new Date());
 
   return (
     <article
@@ -215,6 +231,33 @@ export const CompanyCard = ({
         </div>
       )}
 
+      {nextStep && (
+        <div className={`company_card_step company_card_step--${nextStep.state}`}>
+          {nextStep.state === "overdue" ? (
+            <AlertTriangle size={15} aria-hidden="true" />
+          ) : (
+            <CalendarClock size={15} aria-hidden="true" />
+          )}
+          <span className="company_card_step_text">
+            <strong>{nextStep.label}</strong>
+            {nextStep.dateLabel && <small>{nextStep.dateLabel}</small>}
+          </span>
+          <button
+            type="button"
+            className="company_card_step_done"
+            aria-label={`Mark "${nextStep.label}" as done`}
+            title="Mark as done"
+            disabled={disabled}
+            onClick={(e) => {
+              e.stopPropagation();
+              onCompleteStep?.(id);
+            }}
+          >
+            <Check size={15} aria-hidden="true" />
+          </button>
+        </div>
+      )}
+
       {busyLabel && <div className="company_card_busy">{busyLabel}</div>}
 
       <div className="company_card_footer">
@@ -223,6 +266,22 @@ export const CompanyCard = ({
         </span>
 
         <div className="company_card_actions">
+          {job_url && (
+            <a
+              className="card_icon_btn has-content"
+              href={job_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open the job ad in a new tab"
+              title="Open the job ad"
+              onClick={(e) => e.stopPropagation()}
+              // a link is draggable by default; the card is what should be dragged
+              draggable={false}
+            >
+              <ExternalLink size={17} aria-hidden="true" />
+            </a>
+          )}
+
           <button
             type="button"
             className={`card_icon_btn ${hasNotes ? "has-content" : ""}`}

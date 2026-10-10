@@ -40,6 +40,9 @@ export const ApplicationModal = ({
       salary: initialValues.salary ?? "",
       tags: normalizeTags(initialValues.tags).join(", "),
       notes: initialValues.notes ?? "",
+      next_step: initialValues.next_step ?? "",
+      next_step_date: initialValues.next_step_date ?? "",
+      job_url: initialValues.job_url ?? "",
     };
   }
 
@@ -50,6 +53,9 @@ export const ApplicationModal = ({
     salary: "",
     tags: "",
     notes: "",
+    next_step: "",
+    next_step_date: "",
+    job_url: "",
   };
 }, [mode, initialValues]);
 
@@ -147,6 +153,42 @@ export const ApplicationModal = ({
                 placeholder="e.g. 2000€ / 60k"
                 {...register("salary")}
               />
+            </div>
+
+            <div className="field">
+              <label htmlFor="job-next-step">Next step</label>
+              <input
+                id="job-next-step"
+                type="text"
+                placeholder="HR call"
+                maxLength={120}
+                {...register("next_step")}
+              />
+              {errors.next_step && (
+                <span className="field-error">{errors.next_step.message}</span>
+              )}
+            </div>
+
+            <div className="field">
+              <label htmlFor="job-next-step-date">Due</label>
+              <input id="job-next-step-date" type="date" {...register("next_step_date")} />
+              {errors.next_step_date && (
+                <span className="field-error">{errors.next_step_date.message}</span>
+              )}
+            </div>
+
+            <div className="field field-full">
+              <label htmlFor="job-url">Link to the job ad</label>
+              <input
+                id="job-url"
+                type="url"
+                inputMode="url"
+                placeholder="https://company.com/careers/frontend-developer"
+                {...register("job_url")}
+              />
+              {errors.job_url && (
+                <span className="field-error">{errors.job_url.message}</span>
+              )}
             </div>
 
             <div className="field field-full">

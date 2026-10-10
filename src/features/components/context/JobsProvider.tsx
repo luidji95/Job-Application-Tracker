@@ -16,16 +16,7 @@ import {
 } from "../../../lib/jobs/jobsApi";
 import { applyMove } from "../../../lib/jobs/jobTransitions";
 import type { JobType, StageId } from "../StageColumn";
-import { JobsContext, type JobsContextValue } from "./JobsContext";
-
-type NewJobData = {
-  company_name: string;
-  position: string;
-  location?: string;
-  salary?: string;
-  tags?: string;
-  notes?: string;
-};
+import { JobsContext, type JobsContextValue, type NewJobData } from "./JobsContext";
 
 export const JobsProvider = ({ children }: { children: ReactNode }) => {
   const [userId, setUserId] = useState<string | null>(null);
@@ -95,6 +86,9 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
         salary: data.salary,
         tags: data.tags,
         notes: data.notes,
+        nextStep: data.next_step,
+        nextStepDate: data.next_step_date,
+        jobUrl: data.job_url,
       });
 
       await refetch();
@@ -113,6 +107,9 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
         salary: data.salary,
         tags: data.tags,
         notes: data.notes,
+        nextStep: data.next_step,
+        nextStepDate: data.next_step_date,
+        jobUrl: data.job_url,
       });
 
       await refetch();
