@@ -54,6 +54,9 @@ type StageColumnProps = {
   onOpenNotes?: (jobId: string, anchorRect: DOMRect) => void;
   onOpenAi?: (jobId: string) => void;
   onCompleteStep?: (jobId: string) => void;
+  onOpenHistory?: (jobId: string) => void;
+  // job id -> when the job entered its current stage
+  stageSince?: Record<string, string>;
 
   allStages: StageOption[];
   getJobAction?: (jobId: string) => "move" | "delete" | "restore" | "update" | null;
@@ -88,6 +91,8 @@ export const StageColumn = ({
   onOpenNotes,
   onOpenAi,
   onCompleteStep,
+  onOpenHistory,
+  stageSince,
   activeJobId,
   draggedFromStage = null,
 }: StageColumnProps) => {
@@ -140,6 +145,8 @@ export const StageColumn = ({
                 onOpenNotes={onOpenNotes}
                 onOpenAi={onOpenAi}
                 onCompleteStep={onCompleteStep}
+                onOpenHistory={onOpenHistory}
+                stageSince={stageSince?.[job.id]}
                 allStages={allStages}
                 disabled={disabled}
                 busyLabel={busyLabel}

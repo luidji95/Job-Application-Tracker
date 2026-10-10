@@ -13,7 +13,9 @@ import {
   deleteJobDb,
   moveJobDb,
   restoreJobDb,
+  fetchStageEvents,
 } from "../../../lib/jobs/jobsApi";
+import { stageSinceByJob } from "../../../lib/jobs/jobHistory";
 import { applyMove } from "../../../lib/jobs/jobTransitions";
 import type { JobType, StageId } from "../StageColumn";
 import { JobsContext, type JobsContextValue, type NewJobData } from "./JobsContext";
@@ -21,6 +23,7 @@ import { JobsContext, type JobsContextValue, type NewJobData } from "./JobsConte
 export const JobsProvider = ({ children }: { children: ReactNode }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [jobs, setJobs] = useState<JobType[]>([]);
+  const [stageSince, setStageSince] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,8 +55,14 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
   const refetch = useCallback(async () => {
     if (!userId) return;
 
-    const data = await fetchJobs(userId);
+    // The history only adds detail to the cards, so the board must still load without it.
+    const [data, stageEvents] = await Promise.all([
+      fetchJobs(userId),
+      fetchStageEvents(userId).catch(() => []),
+    ]);
+
     setJobs(data ?? []);
+    setStageSince(stageSinceByJob(stageEvents));
   }, [userId]);
 
   useEffect(() => {
@@ -135,17 +144,20 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
       if (!current) throw new Error("Job not found.");
 
       const previous = jobs;
+      const previousSince = stageSince;
       setJobs(applyMove(jobs, jobId, toStage));
+      setStageSince({ ...stageSince, [jobId]: new Date().toISOString() });
 
       try {
         await moveJobDb(userId, current, toStage);
         await refetch();
       } catch (e) {
         setJobs(previous);
+        setStageSince(previousSince);
         throw e;
       }
     },
-    [userId, jobs, refetch]
+    [userId, jobs, stageSince, refetch]
   );
 
   const restoreJob = useCallback(
@@ -165,6 +177,7 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
     () => ({
       userId,
       jobs,
+      stageSince,
       isLoading,
       error,
       refetch,
@@ -174,7 +187,7 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
       moveJob,
       restoreJob,
     }),
-    [userId, jobs, isLoading, error, refetch, addJob, editJob, deleteJob, moveJob, restoreJob]
+    [userId, jobs, stageSince, isLoading, error, refetch, addJob, editJob, deleteJob, moveJob, restoreJob]
   );
 
   return <JobsContext.Provider value={value}>{children}</JobsContext.Provider>;

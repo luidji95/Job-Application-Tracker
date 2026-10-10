@@ -374,3 +374,35 @@ a.card_icon_btn:hover {
     height: 40px;
   }
 }
+
+/* time in the current stage; opens the history */
+.company_card_age {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: -2px 0 -2px -4px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.company_card_age:hover:not(:disabled) {
+  background: var(--bg);
+  color: var(--ink);
+  text-decoration: underline;
+}
+/* waiting two weeks or more: heavier text, no extra colour */
+.company_card_age.is-long {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+@media (max-width: 860px), (pointer: coarse) {
+  .company_card_age {
+    min-height: 32px;
+  }
+}

@@ -4,6 +4,7 @@ import type { StageId, JobType } from "../../features/components/StageColumn";
 
 import { normalizeStage, normalizeStatus, pickStringOrNull, normalizeTags } from "./jobUtils";
 import { buildMovePatch, buildRestorePatch } from "./jobTransitions";
+import type { JobEvent } from "./jobHistory";
 
 export type JobRow = {
   id: string;
@@ -254,3 +255,41 @@ export const deleteAllJobsDb = async (userId: string) => {
   if (error) throw error;
 };
 
+// ---- history (public.job_events is written by a database trigger; the app only reads) ----
+
+/**
+  Full history of one application, oldest first. Row level security returns
+  only the events of the signed-in user's own applications.
+ */
+export const fetchJobEvents = async (jobId: string): Promise<JobEvent[]> => {
+  const { data, error } = await supabase
+    .from("job_events")
+    .select("id,job_id,type,from_stage,to_stage,detail,step_date,inferred,created_at")
+    .eq("job_id", jobId)
+    .order("created_at", { ascending: true })
+    .order("id", { ascending: true });
+
+  if (error) throw error;
+  return (data ?? []) as JobEvent[];
+};
+
+/**
+  Recent stage changes of all the user's applications, newest first. The board
+  uses them to show how long each application has been in its stage.
+ */
+export const fetchStageEvents = async (
+  userId: string
+): Promise<Pick<JobEvent, "job_id" | "type" | "created_at">[]> => {
+  requireUserId(userId);
+
+  const { data, error } = await supabase
+    .from("job_events")
+    .select("job_id,type,created_at")
+    .eq("user_id", userId)
+    .in("type", ["created", "moved", "rejected", "restored"])
+    .order("created_at", { ascending: false })
+    .limit(1000);
+
+  if (error) throw error;
+  return (data ?? []) as Pick<JobEvent, "job_id" | "type" | "created_at">[];
+};

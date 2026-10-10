@@ -17,6 +17,8 @@ export type NewJobData = {
 export type JobsContextValue = {
   userId: string | null;
   jobs: JobType[];
+  // job id -> when the job entered the stage it is in now
+  stageSince: Record<string, string>;
   isLoading: boolean;
   error: string | null;
 

@@ -6,6 +6,7 @@ import { DEFAULT_STAGES } from "../../data/dummyData";
 import { StageColumn, type JobType, type StageId } from "./StageColumn";
 import { NotesPopover } from "./NotesPopover";
 import { AiInsightModal } from "./AiInsightModal";
+import { HistoryModal } from "./HistoryModal";
 import { useJobs } from "./context/useJobs";
 import { filterJobs } from "../../lib/jobs/jobSearch";
 import { summarizeNextSteps } from "../../lib/jobs/nextStep";
@@ -80,6 +81,7 @@ export const KanbanBoard = () => {
   const [notesState, setNotesState] = useState<NotesStateProps>(null);
   const [confirm, setConfirm] = useState<ConfirmType>(null);
   const [aiState, setAiState] = useState<AiStateProps>(null);
+  const [historyJobId, setHistoryJobId] = useState<string | null>(null);
   const [draggedJob, setDraggedJob] = useState<JobType | null>(null);
 
   // A small movement starts a drag with the mouse, so clicks on the card buttons still work.
@@ -99,6 +101,7 @@ export const KanbanBoard = () => {
 
   const {
     jobs,
+    stageSince,
     isLoading,
     addJob,
     editJob,
@@ -292,6 +295,8 @@ export const KanbanBoard = () => {
     ? jobs.find((j) => j.id === notesState.jobId)
     : null;
 
+  const historyJob = historyJobId ? jobs.find((j) => j.id === historyJobId) : null;
+
   const selectedAiJob = aiState
     ? jobs.find((j) => j.id === aiState.jobId)
     : null;
@@ -408,6 +413,8 @@ export const KanbanBoard = () => {
             onOpenNotes={handleOpenNotes}
             onOpenAi={handleOpenAi}
             onCompleteStep={handleCompleteStep}
+            onOpenHistory={setHistoryJobId}
+            stageSince={stageSince}
             activeJobId={activeJobId}
             draggedFromStage={draggedJob?.stage ?? null}
           />
@@ -432,6 +439,8 @@ export const KanbanBoard = () => {
           onClose={() => setNotesState(null)}
         />
       )}
+
+      {historyJob && <HistoryModal job={historyJob} onClose={() => setHistoryJobId(null)} />}
 
       {aiState && selectedAiJob && (
         <AiInsightModal

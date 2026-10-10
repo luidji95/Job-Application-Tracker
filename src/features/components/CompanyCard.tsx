@@ -3,6 +3,7 @@ import {
   AlertTriangle,
   CalendarClock,
   Check,
+  Clock,
   ExternalLink,
   MapPin,
   MoreHorizontal,
@@ -10,6 +11,7 @@ import {
   StickyNote,
 } from "lucide-react";
 import { getNextStep } from "../../lib/jobs/nextStep";
+import { getStageAge } from "../../lib/jobs/jobHistory";
 import { useDraggable } from "@dnd-kit/core";
 import "./css/companyCard.css";
 import type { JobType, StageId } from "./StageColumn";
@@ -27,6 +29,9 @@ type CompanyCardProps = JobType & {
   onOpenNotes?: (jobId: string, anchorRect: DOMRect) => void;
   onOpenAi?: (jobId: string) => void;
   onCompleteStep?: (jobId: string) => void;
+  onOpenHistory?: (jobId: string) => void;
+  // when the job entered its current stage, if the history knows
+  stageSince?: string;
   allStages: StageOption[];
   disabled?: boolean;
   busyLabel?: string | null;
@@ -111,6 +116,8 @@ export const CompanyCard = ({
   onOpenNotes,
   onOpenAi,
   onCompleteStep,
+  onOpenHistory,
+  stageSince,
   allStages,
   disabled = false,
   busyLabel = null,
@@ -175,6 +182,8 @@ export const CompanyCard = ({
   const meta = [location, salary].filter(Boolean);
   const hasNotes = Boolean(notes && notes.trim());
   const nextStep = getNextStep({ stage, next_step, next_step_date }, new Date());
+  // How long it has been waiting matters only while the application is still open.
+  const stageAge = status === "active" ? getStageAge(stageSince, new Date()) : null;
 
   return (
     <article
@@ -208,6 +217,22 @@ export const CompanyCard = ({
           {location && <MapPin size={13} aria-hidden="true" />}
           {meta.join(" · ")}
         </p>
+      )}
+
+      {stageAge && (
+        <button
+          type="button"
+          className={`company_card_age ${stageAge.isLong ? "is-long" : ""}`}
+          title="Show the history of this application"
+          disabled={disabled}
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenHistory?.(id);
+          }}
+        >
+          <Clock size={13} aria-hidden="true" />
+          {stageAge.label}
+        </button>
       )}
 
       {tags.length > 0 && (
@@ -399,6 +424,19 @@ export const CompanyCard = ({
                     ))}
                   </div>
                 )}
+
+                <button
+                  type="button"
+                  className="card_menu_item"
+                  role="menuitem"
+                  onClick={() => {
+                    onOpenHistory?.(id);
+                    setMenuOpen(false);
+                    setMoveOpen(false);
+                  }}
+                >
+                  History
+                </button>
 
                 <button
                   type="button"
