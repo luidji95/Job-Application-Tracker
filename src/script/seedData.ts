@@ -65,8 +65,8 @@ export const seedDummyJobs = async (tableName: string = "jobs") => {
         tags: normalizeTags(job.tags),
         notes: pickStringOrNull(job.notes),
         applied_date: job.applied_date || nowIso,
-        rejected_from_stage: status === "rejected"
-          ? normalizeStage(job.rejected_from_stage ?? stage) as string // cast
+        rejected_from_stage: status === "rejected" && job.rejected_from_stage
+          ? normalizeStage(job.rejected_from_stage) as string // cast
           : null,
       };
     });
