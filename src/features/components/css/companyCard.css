@@ -406,3 +406,11 @@ a.card_icon_btn:hover {
     min-height: 32px;
   }
 }
+
+/* link to the job ad sits beside the company name, so the footer keeps room for the date */
+.company_card_link {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  margin: -4px -6px 0 auto;
+}
+

@@ -32,6 +32,8 @@
 
 .toolbar-search input {
   flex: 1 1 auto;
+  /* an input has a built-in width of about twenty characters; without this it refuses to shrink */
+  width: 0;
   min-width: 0;
   height: 42px;
   border: 0;

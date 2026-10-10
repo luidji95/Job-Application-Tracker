@@ -210,6 +210,22 @@ export const CompanyCard = ({
           <h4>{company_name}</h4>
           <p>{position}</p>
         </div>
+
+        {job_url && (
+          <a
+            className="card_icon_btn has-content company_card_link"
+            href={job_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open the job ad in a new tab"
+            title="Open the job ad"
+            onClick={(e) => e.stopPropagation()}
+            // a link is draggable by default; the card is what should be dragged
+            draggable={false}
+          >
+            <ExternalLink size={16} aria-hidden="true" />
+          </a>
+        )}
       </div>
 
       {meta.length > 0 && (
@@ -291,22 +307,6 @@ export const CompanyCard = ({
         </span>
 
         <div className="company_card_actions">
-          {job_url && (
-            <a
-              className="card_icon_btn has-content"
-              href={job_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Open the job ad in a new tab"
-              title="Open the job ad"
-              onClick={(e) => e.stopPropagation()}
-              // a link is draggable by default; the card is what should be dragged
-              draggable={false}
-            >
-              <ExternalLink size={17} aria-hidden="true" />
-            </a>
-          )}
-
           <button
             type="button"
             className={`card_icon_btn ${hasNotes ? "has-content" : ""}`}
