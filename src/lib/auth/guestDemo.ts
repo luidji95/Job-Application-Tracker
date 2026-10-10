@@ -21,6 +21,4 @@ export async function signInAsGuest() {
   });
 
   if (signInErr) throw signInErr;
-
-  localStorage.setItem("is_demo", "1");
 }

@@ -10,6 +10,7 @@ import { seedDummyJobs } from "../../script/seedData";
 import { deleteAllJobsDb } from "../../lib/jobs/jobsApi";
 import { ConfirmModal } from "../../features/components/ModalComponents/ConfirmModal";
 import { toast } from "sonner";
+import { isGuestEmail } from "../../lib/auth/guest";
 
 import { JobsProvider } from "../../features/components/context/JobsProvider";
 
@@ -46,7 +47,7 @@ const DashboardLayout = () => {
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
 
   const navigate = useNavigate();
-  const isDemo = localStorage.getItem("is_demo") === "1";
+  const isDemo = isGuestEmail(profile?.email);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -74,20 +75,19 @@ const DashboardLayout = () => {
   }, []);
 
   const handleLogout = async () => {
-    const isDemo = localStorage.getItem("is_demo") === "1";
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-    if (isDemo) {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
-
-      if (!error && user) {
-        await deleteAllJobsDb(user.id);
-      }
-
-      localStorage.removeItem("is_demo");
+    // Only a guest account is emptied on logout, and that is decided by the account,
+    // not by anything stored in the browser.
+    if (!error && user && isGuestEmail(user.email)) {
+      await deleteAllJobsDb(user.id);
     }
+
+    // older versions kept a flag here; make sure it is gone
+    localStorage.removeItem("is_demo");
 
     await supabase.auth.signOut();
     navigate("/login", { replace: true });
