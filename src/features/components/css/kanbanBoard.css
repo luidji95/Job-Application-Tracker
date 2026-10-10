@@ -33,7 +33,7 @@
   align-items: stretch;
   min-height: min(60vh, 520px);
   min-width: min-content;
-  padding-bottom: 120px;
+  padding-bottom: 24px;
 }
 
 /* narrow screens: one column at a time, swipe to the next */

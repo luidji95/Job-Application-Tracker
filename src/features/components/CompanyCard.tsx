@@ -54,6 +54,24 @@ const getCompanyInitials = (name: string) => {
     .slice(0, 2);
 };
 
+const MENU_WIDTH = 190;
+// tallest the menu gets, with the "Move to" list open
+const MENU_MAX_HEIGHT = 330;
+
+type MenuPosition = { left: number; top: number | "auto"; bottom: number | "auto" };
+
+// The menu is placed against the screen (position: fixed) next to its button:
+// below it when there is room, above it otherwise, and never past the screen edge.
+const placeMenu = (button: DOMRect): MenuPosition => {
+  const left = Math.max(8, Math.min(button.right - MENU_WIDTH, window.innerWidth - MENU_WIDTH - 8));
+  const fitsBelow = button.bottom + MENU_MAX_HEIGHT <= window.innerHeight;
+  const fitsAbove = button.top - MENU_MAX_HEIGHT >= 0;
+
+  return fitsBelow || !fitsAbove
+    ? { left, top: button.bottom + 2, bottom: "auto" }
+    : { left, top: "auto", bottom: window.innerHeight - button.top + 2 };
+};
+
 const formatApplied = (value: string) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
@@ -85,6 +103,7 @@ export const CompanyCard = ({
 }: CompanyCardProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [moveOpen, setMoveOpen] = useState(false);
+  const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
 
   const menuRef = useRef<HTMLDivElement | null>(null);
 
@@ -107,6 +126,23 @@ export const CompanyCard = ({
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
+
+  // The menu does not follow its card, so it closes when anything scrolls or the window changes.
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const close = () => {
+      setMenuOpen(false);
+      setMoveOpen(false);
+    };
+
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+    return () => {
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
+  }, [menuOpen]);
 
   const stageOptions = allStages.filter((s) => s.id !== stage);
 
@@ -227,6 +263,7 @@ export const CompanyCard = ({
               onClick={(e) => {
                 e.stopPropagation();
                 if (disabled) return;
+                setMenuPosition(placeMenu(e.currentTarget.getBoundingClientRect()));
                 setMenuOpen((prev) => !prev);
                 setMoveOpen(false);
               }}
@@ -234,8 +271,16 @@ export const CompanyCard = ({
               <MoreHorizontal size={17} aria-hidden="true" />
             </button>
 
-            {menuOpen && !disabled && (
-              <div className="card_menu" role="menu" onClick={(e) => e.stopPropagation()}>
+            {menuOpen && !disabled && menuPosition && (
+              <div
+                className="card_menu"
+                role="menu"
+                style={{ ...menuPosition, width: MENU_WIDTH }}
+                onClick={(e) => e.stopPropagation()}
+                // a press inside the menu must not start dragging the card
+                onMouseDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
+              >
                 <button
                   type="button"
                   className="card_menu_item"

@@ -200,12 +200,12 @@
   position: relative;
 }
 
+/* placed against the screen by the component (left / top / bottom / width) */
 .card_menu {
-  position: absolute;
-  top: calc(100% + 2px);
-  right: 0;
-  z-index: 15;
-  min-width: 190px;
+  position: fixed;
+  z-index: 40;
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   padding: 6px;
