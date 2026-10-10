@@ -3,6 +3,7 @@ import { supabase } from "../supabaseClient";
 import type { StageId, JobType } from "../../features/components/StageColumn";
 
 import { normalizeStage, normalizeStatus, pickStringOrNull, normalizeTags } from "./jobUtils";
+import { buildMovePatch, buildRestorePatch } from "./jobTransitions";
 
 export type JobRow = {
   id: string;
@@ -169,22 +170,7 @@ export const moveJobDb = async (
 ): Promise<JobType> => {
   requireUserId(userId);
 
-  const fromStage = job.stage;
-
-  const patch: Record<string, unknown> = {};
-
-  if (toStage === "rejected") {
-    patch.stage = "rejected";
-    patch.status = "rejected";
-    patch.rejected_from_stage = fromStage;
-  } else if (fromStage === "rejected") {
-    patch.stage = toStage;
-    patch.status = "active";
-    patch.rejected_from_stage = null;
-  } else {
-    patch.stage = toStage;
-    // status stays same (usually "active") 
-  }
+  const patch = buildMovePatch(job.stage, toStage);
 
   const { data, error } = await supabase
     .from(TABLE)
@@ -205,15 +191,9 @@ export const moveJobDb = async (
 export const restoreJobDb = async (userId: string, job: JobType): Promise<JobType> => {
   requireUserId(userId);
 
-  const backTo: StageId = job.rejected_from_stage ?? "applied";
-
   const { data, error } = await supabase
     .from(TABLE)
-    .update({
-      stage: backTo,
-      status: "active",
-      rejected_from_stage: null,
-    })
+    .update(buildRestorePatch(job))
     .eq("id", job.id)
     .eq("user_id", userId)
     .select()

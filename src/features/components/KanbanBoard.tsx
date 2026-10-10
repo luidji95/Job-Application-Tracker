@@ -7,6 +7,7 @@ import { StageColumn, type JobType, type StageId } from "./StageColumn";
 import { NotesPopover } from "./NotesPopover";
 import { AiInsightModal } from "./AiInsightModal";
 import { useJobs } from "./context/useJobs";
+import { filterJobs } from "../../lib/jobs/jobSearch";
 
 import { toast } from "sonner";
 import { ErrorBanner } from "../../components/ui/ErrorBanner";
@@ -92,24 +93,7 @@ export const KanbanBoard = () => {
   const isAdding = action?.type === "add";
   const isConfirmBusy = action?.type === "delete";
 
-  const filteredJobs = useMemo(() => {
-    const q = searchValue.trim().toLowerCase();
-    if (!q) return jobs;
-
-    return jobs.filter((j) => {
-      const company = (j.company_name ?? "").toLowerCase();
-      const position = (j.position ?? "").toLowerCase();
-      const location = (j.location ?? "").toLowerCase();
-      const tags = (j.tags ?? []).join(" ").toLowerCase();
-
-      return (
-        company.includes(q) ||
-        position.includes(q) ||
-        location.includes(q) ||
-        tags.includes(q)
-      );
-    });
-  }, [jobs, searchValue]);
+  const filteredJobs = useMemo(() => filterJobs(jobs, searchValue), [jobs, searchValue]);
 
   const searchResults = useMemo<SearchResult[]>(() => {
     const q = searchValue.trim();

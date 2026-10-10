@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useJobs } from "../../features/components/context/useJobs";
-import type { StageId, JobType } from "../../features/components/StageColumn";
+import type { StageId } from "../../features/components/StageColumn";
+import { computeJobStats } from "../../lib/jobs/jobStats";
 import "./statistics.css";
 
 const STAGE_LABELS: Record<StageId, string> = {
@@ -15,120 +16,11 @@ const STAGE_LABELS: Record<StageId, string> = {
 
 const percent = (value: number) => `${Math.round(value)}%`;
 
-// istorijski funnel stage
-const getPipelineStage = (job: JobType): StageId => {
-  if (job.stage === "rejected" && job.rejected_from_stage) {
-    return job.rejected_from_stage;
-  }
-
-  return job.stage;
-};
-
 export const StatisticsPage = () => {
   const navigate = useNavigate();
   const { jobs, isLoading, error } = useJobs();
 
-  const stats = useMemo(() => {
-    const totalApplications = jobs.length;
-
-    // istorijski funnel
-    const pipelineStages = jobs.map(getPipelineStage);
-
-    const reachedHR = pipelineStages.filter(
-      (stage) =>
-        stage === "hr-interview" ||
-        stage === "technical" ||
-        stage === "final" ||
-        stage === "offer"
-    ).length;
-
-    const reachedTechnical = pipelineStages.filter(
-      (stage) =>
-        stage === "technical" || stage === "final" || stage === "offer"
-    ).length;
-
-    const reachedFinal = pipelineStages.filter(
-      (stage) => stage === "final" || stage === "offer"
-    ).length;
-
-    const reachedOffer = pipelineStages.filter(
-      (stage) => stage === "offer"
-    ).length;
-
-    // trenutni status
-    const rejectedCount = jobs.filter(
-      (job) => job.status === "rejected"
-    ).length;
-
-    const currentlyInApplied = jobs.filter(
-      (job) => job.stage === "applied" && job.status === "active"
-    ).length;
-
-    // stope
-    const screeningPassRate =
-      totalApplications > 0 ? (reachedHR / totalApplications) * 100 : 0;
-
-    const hrPassRate =
-      reachedHR > 0 ? (reachedTechnical / reachedHR) * 100 : 0;
-
-    const technicalPassRate =
-      reachedTechnical > 0 ? (reachedFinal / reachedTechnical) * 100 : 0;
-
-    const offerConversion =
-      totalApplications > 0 ? (reachedOffer / totalApplications) * 100 : 0;
-
-    // stage breakdown (istorijski funnel)
-    const stageBreakdown: Record<StageId, number> = {
-      applied: 0,
-      "hr-interview": 0,
-      technical: 0,
-      final: 0,
-      offer: 0,
-      rejected: 0,
-    };
-
-    for (const stage of pipelineStages) {
-      stageBreakdown[stage] += 1;
-    }
-
-    // most common rejection stage
-    const rejectionStageCount: Partial<Record<StageId, number>> = {};
-
-    for (const job of jobs) {
-      if (job.status === "rejected" && job.rejected_from_stage) {
-        rejectionStageCount[job.rejected_from_stage] =
-          (rejectionStageCount[job.rejected_from_stage] ?? 0) + 1;
-      }
-    }
-
-    let mostCommonRejectionStage: StageId | null = null;
-    let highestRejectCount = 0;
-
-    for (const stage of Object.keys(rejectionStageCount) as StageId[]) {
-      const count = rejectionStageCount[stage] ?? 0;
-      if (count > highestRejectCount) {
-        highestRejectCount = count;
-        mostCommonRejectionStage = stage;
-      }
-    }
-
-    return {
-      totalApplications,
-      reachedHR,
-      reachedTechnical,
-      reachedFinal,
-      reachedOffer,
-      rejectedCount,
-      currentlyInApplied,
-      screeningPassRate,
-      hrPassRate,
-      technicalPassRate,
-      offerConversion,
-      stageBreakdown,
-      mostCommonRejectionStage,
-      highestRejectCount,
-    };
-  }, [jobs]);
+  const stats = useMemo(() => computeJobStats(jobs), [jobs]);
 
   if (isLoading) {
     return <div className="page-loading">Loading statistics...</div>;
