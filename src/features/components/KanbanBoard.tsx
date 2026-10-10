@@ -15,6 +15,21 @@ import { ApplicationModal } from "./ModalComponents/ApplicationModal";
 import { ConfirmModal } from "./ModalComponents/ConfirmModal";
 
 import { useOutletContext } from "react-router-dom";
+import {
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  pointerWithin,
+  rectIntersection,
+  useSensor,
+  useSensors,
+  type CollisionDetection,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import { isValidStageId } from "../../lib/jobs/jobUtils";
 import { Plus } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import type { DashboardOutletContext } from "../../pages/Dashboard/DashboardLayout";
@@ -50,6 +65,12 @@ type SearchResult = {
   stage: string;
 };
 
+// The column under the pointer wins; the keyboard has no pointer, so it falls back to overlap.
+const columnUnderPointer: CollisionDetection = (args) => {
+  const hits = pointerWithin(args);
+  return hits.length > 0 ? hits : rectIntersection(args);
+};
+
 type AiStateProps =
   | {
       jobId: string;
@@ -66,6 +87,15 @@ export const KanbanBoard = () => {
   const [notesState, setNotesState] = useState<NotesStateProps>(null);
   const [confirm, setConfirm] = useState<ConfirmType>(null);
   const [aiState, setAiState] = useState<AiStateProps>(null);
+  const [draggedJob, setDraggedJob] = useState<JobType | null>(null);
+
+  // A small movement starts a drag with the mouse, so clicks on the card buttons still work.
+  // On touch a short press-and-hold starts it, so scrolling the page is not hijacked.
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 220, tolerance: 8 } }),
+    useSensor(KeyboardSensor)
+  );
 
   const {
     searchValue,
@@ -141,6 +171,22 @@ export const KanbanBoard = () => {
     } finally {
       setAction(null);
     }
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setDraggedJob(jobs.find((j) => j.id === event.active.id) ?? null);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setDraggedJob(null);
+
+    const toStage = event.over ? String(event.over.id) : null;
+    if (!toStage || !isValidStageId(toStage)) return;
+
+    const job = jobs.find((j) => j.id === event.active.id);
+    if (!job || job.stage === toStage) return;
+
+    void handleMoveJob(job.id, toStage);
   };
 
   const handleRestoreJob = async (jobId: string) => {
@@ -302,7 +348,14 @@ export const KanbanBoard = () => {
         ))}
       </nav>
 
-      <div className="kanban-board">
+      <DndContext
+        sensors={sensors}
+        collisionDetection={columnUnderPointer}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={() => setDraggedJob(null)}
+      >
+      <div className={`kanban-board ${draggedJob ? "is-dragging" : ""}`}>
         {DEFAULT_STAGES.map((s) => (
           <StageColumn
             key={s.id}
@@ -321,9 +374,20 @@ export const KanbanBoard = () => {
             onOpenNotes={handleOpenNotes}
             onOpenAi={handleOpenAi}
             activeJobId={activeJobId}
+            draggedFromStage={draggedJob?.stage ?? null}
           />
         ))}
       </div>
+
+        <DragOverlay>
+          {draggedJob ? (
+            <div className="company_card company_card--overlay">
+              <strong>{draggedJob.company_name}</strong>
+              <span>{draggedJob.position}</span>
+            </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
 
       {notesState && selectedNotesJob && (
         <NotesPopover

@@ -14,6 +14,7 @@ import {
   moveJobDb,
   restoreJobDb,
 } from "../../../lib/jobs/jobsApi";
+import { applyMove } from "../../../lib/jobs/jobTransitions";
 import type { JobType, StageId } from "../StageColumn";
 import { JobsContext, type JobsContextValue } from "./JobsContext";
 
@@ -136,8 +137,16 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
       const current = jobs.find((j) => j.id === jobId);
       if (!current) throw new Error("Job not found.");
 
-      await moveJobDb(userId, current, toStage);
-      await refetch();
+      const previous = jobs;
+      setJobs(applyMove(jobs, jobId, toStage));
+
+      try {
+        await moveJobDb(userId, current, toStage);
+        await refetch();
+      } catch (e) {
+        setJobs(previous);
+        throw e;
+      }
     },
     [userId, jobs, refetch]
   );

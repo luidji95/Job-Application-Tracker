@@ -41,3 +41,12 @@ export const buildRestorePatch = (
   status: "active",
   rejected_from_stage: null,
 });
+
+/**
+  The list as it looks right after a job is moved, before the server answers.
+  Used to show the move immediately; the real data replaces it on refetch.
+ */
+export const applyMove = (jobs: JobType[], jobId: string, toStage: StageId): JobType[] =>
+  jobs.map((job) =>
+    job.id === jobId ? { ...job, ...buildMovePatch(job.stage, toStage) } : job
+  );

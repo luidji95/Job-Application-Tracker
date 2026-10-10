@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { MapPin, MoreHorizontal, Sparkles, StickyNote } from "lucide-react";
+import { useDraggable } from "@dnd-kit/core";
 import "./css/companyCard.css";
 import type { JobType, StageId } from "./StageColumn";
 
@@ -87,6 +88,13 @@ export const CompanyCard = ({
 
   const menuRef = useRef<HTMLDivElement | null>(null);
 
+  // The whole card can be dragged to another column; the menu stays as the other way to move it.
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id,
+    disabled,
+    attributes: { role: "group", roleDescription: "draggable application" },
+  });
+
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
       if (!menuRef.current) return;
@@ -118,11 +126,15 @@ export const CompanyCard = ({
 
   return (
     <article
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
       id={`job-${id}`}
       className={`company_card company_card--${status} ${disabled ? "is-busy" : ""} ${
         isActive ? "is-active" : ""
-      }`}
+      } ${isDragging ? "is-dragging" : ""}`}
       data-id={id}
+      aria-label={`${company_name}, ${position}`}
     >
       <div className="company_card_header">
         <div

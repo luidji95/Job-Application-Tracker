@@ -1,5 +1,6 @@
 import "./css/stageColumn.css";
 import { Plus } from "lucide-react";
+import { useDroppable } from "@dnd-kit/core";
 import { CompanyCard } from "./CompanyCard";
 
 type StatusVariant = "active" | "accepted" | "rejected";
@@ -52,6 +53,8 @@ type StageColumnProps = {
   getJobAction?: (jobId: string) => "move" | "delete" | "restore" | "update" | null;
   isAdding?: boolean;
   activeJobId?: string | null;
+  // stage of the card being dragged right now, or null when nothing is dragged
+  draggedFromStage?: StageId | null;
 };
 
 const EMPTY_TEXT: Record<StageId, string> = {
@@ -79,11 +82,21 @@ export const StageColumn = ({
   onOpenNotes,
   onOpenAi,
   activeJobId,
+  draggedFromStage = null,
 }: StageColumnProps) => {
   const isApplied = id === "applied";
 
+  const { setNodeRef, isOver } = useDroppable({ id });
+  // dropping a card on the column it is already in does nothing, so don't invite it
+  const isDropTarget = isOver && draggedFromStage !== null && draggedFromStage !== id;
+
   return (
-    <section className="stage_column" id={`stage-${id}`} data-stage={id}>
+    <section
+      ref={setNodeRef}
+      className={`stage_column ${isDropTarget ? "is-drop-target" : ""}`}
+      id={`stage-${id}`}
+      data-stage={id}
+    >
       <div className="stage_column_header">
         <span className="stage_column_dot" style={{ background: color }} />
         <h3>{title}</h3>

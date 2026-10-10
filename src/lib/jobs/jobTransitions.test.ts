@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { JobType, StageId } from "../../features/components/StageColumn";
-import { buildMovePatch, buildRestorePatch } from "./jobTransitions";
+import { applyMove, buildMovePatch, buildRestorePatch } from "./jobTransitions";
+import { makeJob, rejectedFrom } from "./testJob";
 
 const OPEN_STAGES: StageId[] = ["applied", "hr-interview", "technical", "final", "offer"];
 const ALL_STAGES: StageId[] = [...OPEN_STAGES, "rejected"];
@@ -88,5 +89,57 @@ describe("reject then restore", () => {
 
     expect(restored.stage).toBe(stage);
     expect(restored.status).toBe("active");
+  });
+});
+
+describe("applyMove", () => {
+  it("moves only the chosen job", () => {
+    const a = makeJob({ stage: "applied" });
+    const b = makeJob({ stage: "applied" });
+
+    const result = applyMove([a, b], a.id, "technical");
+
+    expect(result[0].stage).toBe("technical");
+    expect(result[1]).toBe(b);
+  });
+
+  it("does not change the original list", () => {
+    const job = makeJob({ stage: "applied" });
+    const jobs = [job];
+
+    applyMove(jobs, job.id, "final");
+
+    expect(jobs[0].stage).toBe("applied");
+  });
+
+  it("shows a job dropped on rejected the same way the server will store it", () => {
+    const job = makeJob({ stage: "technical" });
+
+    const [moved] = applyMove([job], job.id, "rejected");
+
+    expect(moved).toMatchObject({ stage: "rejected", status: "rejected", rejected_from_stage: "technical" });
+    expect(violatesDatabaseRules(moved)).toBeNull();
+  });
+
+  it("reactivates a rejected job dragged back to an open stage", () => {
+    const job = rejectedFrom("technical");
+
+    const [moved] = applyMove([job], job.id, "final");
+
+    expect(moved).toMatchObject({ stage: "final", status: "active", rejected_from_stage: null });
+  });
+
+  it("keeps an accepted offer accepted when it is moved", () => {
+    const job = makeJob({ stage: "offer", status: "accepted" });
+
+    const [moved] = applyMove([job], job.id, "final");
+
+    expect(moved.status).toBe("accepted");
+  });
+
+  it("returns the list unchanged when the job is not in it", () => {
+    const jobs = [makeJob()];
+
+    expect(applyMove(jobs, "missing", "final")).toEqual(jobs);
   });
 });
